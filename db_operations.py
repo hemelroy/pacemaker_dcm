@@ -22,7 +22,7 @@ def check_user_count():
     return is_full
 
 
-def register_user():
+def register_user(user, password):
     conn=sqlite3.connect("records.db")
     cur=conn.cursor()
     
