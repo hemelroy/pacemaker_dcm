@@ -25,6 +25,9 @@ def register():
         print("flop")
     else:
         db_operations.register_user(user, password)
+        raise_frame(params_frame)        
+
+
 
 window = Tk()
 window.geometry("800x400") #Width x Height
@@ -32,19 +35,20 @@ window.geometry("800x400") #Width x Height
 intro_frame = Frame(window)
 login_frame = Frame(window)
 register_frame = Frame(window)
+params_frame = Frame(window)
 
-for frame in (intro_frame, login_frame, register_frame):
+for frame in (intro_frame, login_frame, register_frame, params_frame):
     frame.grid(row=0, column=0, sticky='news')
 
 window.wm_title("Elite Beat")
 
 #intro_frame
-l1 = Label(intro_frame, text="Elite Beat Pacemaker Device Control Monitor", fg = "red", font = "Helvetica 16 bold italic", justify="center")
-l1.grid(row=0, column=3, columnspan=6, pady=20)
-b1 = Button(intro_frame, text="Login", width=15, command=login)
-b1.grid(row=6, column=2, columnspan=3, padx=10, pady=10)
-b2 = Button(intro_frame, text="Register New User", width=15, command=check_register_viability)
-b2.grid(row=6, column=7, columnspan=3, padx=10, pady=10)
+intro_title_label = Label(intro_frame, text="Elite Beat Pacemaker Device Control Monitor", fg = "red", font = "Helvetica 16 bold italic", justify="center")
+intro_title_label.grid(row=0, column=3, columnspan=6, pady=20)
+intro_login_button = Button(intro_frame, text="Login", width=15, command=lambda:raise_frame(login_frame))
+intro_login_button.grid(row=6, column=2, columnspan=3, padx=10, pady=10)
+intro_register_button = Button(intro_frame, text="Register New User", width=15, command=check_register_viability)
+intro_register_button.grid(row=6, column=7, columnspan=3, padx=10, pady=10)
 raise_frame(intro_frame)
 
 
@@ -93,11 +97,60 @@ register_back_button = Button(register_frame, text="Back", width=15, command=lam
 register_back_button.grid(row=4, column=7, columnspan=3, padx=10, pady=10)
 
 
-## Text field
-#title_text = StringVar()
-#e1 = Entry(window, textvariable=title_text)
-#e1.grid(row=0, column=1)
+#params_frame
+params_title_label = Label(params_frame, text="Programmable Parameters", fg = "red", font = "Helvetica 16 bold italic", justify="center")
+params_title_label.grid(row=0, column=3, columnspan=6, pady=20)
 
+default = StringVar(params_frame)
+default.set("VOO") # default value
+pacingModeOption = OptionMenu(params_frame, default, "VOO", "AOO", "AAI", "VVI")
+pacingModeOption.grid(row=1, column=2, columnspan=5)
+# pacingMode_label = Label(params_frame, text="Username", font = "Helvetica 12", justify="center")
+# pacingMode_label.grid(row=2, column=0, columnspan=2)
+# pacingMode = StringVar()
+# pacingMode_field = Entry(params_frame, textvariable=pacingMode)
+# pacingMode_field.grid(row=2, column=2, columnspan=5)
+
+lowRateInterval_label = Label(params_frame, text="Lower Rate Limit", font = "Helvetica 12", justify="center")
+lowRateInterval_label.grid(row=3, column=0, columnspan=2)
+lowRateInterval = StringVar()
+lowRateInterval_field = Entry(params_frame, textvariable=lowRateInterval)
+lowRateInterval_field.grid(row=3, column=2, columnspan=5)
+
+uppRateInterval_label = Label(params_frame, text="Upper Rate Limit", font = "Helvetica 12", justify="center")
+uppRateInterval_label.grid(row=4, column=0, columnspan=2)
+uppRateInterval = StringVar()
+uppRateInterval_field = Entry(params_frame, textvariable=uppRateInterval)
+uppRateInterval_field.grid(row=4, column=2, columnspan=5)
+
+vPaceAmp_label = Label(params_frame, text="Ventricular Amplitude", font = "Helvetica 12", justify="center")
+vPaceAmp_label.grid(row=5, column=0, columnspan=2)
+vPaceAmp = StringVar()
+vPaceAmp_field = Entry(params_frame, textvariable=vPaceAmp)
+vPaceAmp_field.grid(row=5, column=2, columnspan=5)
+
+vPulseWidth_label = Label(params_frame, text="Ventricular Pulse Width", font = "Helvetica 12", justify="center")
+vPulseWidth_label.grid(row=6, column=0, columnspan=2)
+vPulseWidth = StringVar()
+vPulseWidth_field = Entry(params_frame, textvariable=vPulseWidth)
+vPulseWidth_field.grid(row=6, column=2, columnspan=5)
+
+aPaceAmp_label = Label(params_frame, text="Atrial Amplitude", font = "Helvetica 12", justify="center")
+aPaceAmp_label.grid(row=7, column=0, columnspan=2)
+aPaceAmp = StringVar()
+aPaceAmp_field = Entry(params_frame, textvariable=aPaceAmp)
+aPaceAmp_field.grid(row=7, column=2, columnspan=5)
+
+aPulseWidth_label = Label(params_frame, text="Atrial Pulse Width", font = "Helvetica 12", justify="center")
+aPulseWidth_label.grid(row=8, column=0, columnspan=2)
+aPulseWidth = StringVar()
+aPulseWidth_field = Entry(params_frame, textvariable=aPulseWidth)
+aPulseWidth_field.grid(row=8, column=2, columnspan=5)
+
+update_button = Button(params_frame, text="Update", width=15, command=register)
+update_button.grid(row=9, column=2, columnspan=3, padx=10, pady=10)
+params_back_button = Button(params_frame, text="Back", width=15, command=lambda:raise_frame(login_frame))
+params_back_button.grid(row=9, column=7, columnspan=3, padx=10, pady=10)
 
 
 window.mainloop()
