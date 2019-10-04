@@ -1,0 +1,18 @@
+1. Develop an interface that includes a welcome screen, including the ability to register a new user (name and password),
+and to login as an existing user. A maximum of 10 users should be allowed to be stored locally.
+
+2. Develop essential aspects of the user interface - with respect to 3.2.2 in PACEMAKER, you should include: 1, 2
+(input buttons), 3, 4, and 7.
+
+    1 - The user interface shall be capable of utilizing and managing windows for display of text and graphics.
+    2 - The user interface shall be capable of processing user positioning and input buttons.
+    3 - The user interface shall be capable of displaying all programmable parameters for review and modification.
+    4 - The user interface shall be capable of visually indicating when the DCM and the device are communicating.
+    7 - The user interface shall be capable of visually indicating when a different PACEMAKER device is approached than was 
+        previously interrogated.
+
+3. Develop interfaces for all of the pacing modes mentioned in Part 1.
+
+4. Make provision for storing programmable parameter data for checking inputs - for the purposes of this assignment
+the parameters we want specifically are: Lower Rate Limit, Upper Rate Limit, Atrial Amplitude, Atrial Pules Width,
+Ventricular Amplitude, and Ventricular Pulse Width. The complete set is in PACEMAKER document on page 28.
