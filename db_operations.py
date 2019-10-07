@@ -4,8 +4,7 @@ def connect():
 	conn=sqlite3.connect("records.db")
 	cur=conn.cursor()
 	cur.execute("CREATE TABLE IF NOT EXISTS Users (user_id INTEGER PRIMARY KEY, username text, password text)")
-	cur.execute("CREATE TABLE IF NOT EXISTS Attributes (user_id integer NOT NULL, v Amp , a Amp, FOREIGN KEY(user_id) REFERENCES Users (user_id))")
-	#cur.execute("CREATE TABLE IF NOT EXISTS Attributes (FOREIGN KEY(user_id) REFERENCES Users(user_id), v Amp, a Amp)")
+	cur.execute("CREATE TABLE IF NOT EXISTS Attributes (user_id integer NOT NULL, lrLimit, urLimit, vAmplitude, vPWidth,aAmplitude, aPWidth, FOREIGN KEY(user_id) REFERENCES Users (user_id))")
 	conn.commit()
 	conn.close()
 
@@ -35,14 +34,20 @@ def register_user(r_username, r_password):
 	conn.close()
 	return id
 	
-def add_attribute(id,v_value, a_value):
+def add_attribute(id,lrLimit, urLimit, vAmplitude, vPWidth,aAmplitude, aPWidth):
 	conn=sqlite3.connect("records.db")
 	cur=conn.cursor()
-	#cur.execute("INSERT INTO Attributes VALUES (NULL,?,?)",(v_value, a_value))
-	cur.execute("INSERT INTO Attributes VALUES (?,?,?)",(id,v_value, a_value))
+	cur.execute("INSERT INTO Attributes VALUES (?,?,?,?,?,?,?)",(id,lrLimit, urLimit, vAmplitude, vPWidth,aAmplitude, aPWidth))
 	conn.commit()
 	conn.close()
 
+def update_attribute(id, parameters):
+	conn=sqlite3.connect('records.db')
+	cur=conn.cursor()
+	cur.execute("Update Attributes set lrLimit=?, urLimit=?,vAmplitude=?,vPWidth=?, aAmplitude=?,aPWidth=? where user_id = ?",(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4],parameters[5],id))
+	conn.commit()
+	conn.close()
+	
 def database_fetch():
 	conn=sqlite3.connect("records.db")
 	cur=conn.cursor()
@@ -74,7 +79,10 @@ def login_user(user, password):
 
 		
 connect()
-#myID = register_user('hemel','myPass')
-#add_attribute(5, '3.9','2.1')
-#database_fetch()
+myID = register_user('hemel','myPass')
+add_attribute(1, '1.1','2.2','3.3','4.4','5.5','6.6')
+database_fetch()
+parameter_list = ['1.9','1.2','3.7','4.4','3.5','7.7']
+update_attribute(1,parameter_list)
+database_fetch()
 
