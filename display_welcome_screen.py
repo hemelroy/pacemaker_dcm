@@ -1,4 +1,5 @@
 from tkinter import *
+from PIL import ImageTk, Image
 import sqlite3
 import db_operations
 
@@ -15,6 +16,22 @@ def check_register_viability():
         raise_frame(register_frame)
 
 def login():
+    #raise_frame(login_frame)
+    user = username_field.get()
+    password = password_field.get()
+
+    if not user and not password:
+        print("Missing fields")
+    else:
+        db_operations.login_user(user, password)
+
+    #call db function to check if user exists
+
+    #if user exists, log them in and pull up their attributes
+
+    #if not, display error message
+
+def to_login():
     raise_frame(login_frame)
 
 def register():
@@ -24,7 +41,8 @@ def register():
     if not user or not password:
         print("flop")
     else:
-        db_operations.register_user(user, password)
+        userid = db_operations.register_user(user, password)
+        db_operations.add_attributes(userid, 50, 50, )
         raise_frame(params_frame)        
 
 
@@ -32,7 +50,7 @@ def register():
 window = Tk()
 window.geometry("800x400") #Width x Height
 
-intro_frame = Frame(window)
+intro_frame = Frame(window, bg="red")
 login_frame = Frame(window)
 register_frame = Frame(window)
 params_frame = Frame(window)
@@ -41,33 +59,36 @@ for frame in (intro_frame, login_frame, register_frame, params_frame):
     frame.grid(row=0, column=0, sticky='news')
 
 window.wm_title("Elite Beat")
+window.configure(background='black')
+
 
 #intro_frame
-intro_title_label = Label(intro_frame, text="Elite Beat Pacemaker Device Control Monitor", fg = "red", font = "Helvetica 16 bold italic", justify="center")
+intro_title_label = Label(intro_frame, text="Elite Beat Pacemaker Device Control Monitor", fg = "red", bg="black", font = "Helvetica 16 bold italic", justify="center", padx=170, pady=100)
 intro_title_label.grid(row=0, column=3, columnspan=6, pady=20)
 intro_login_button = Button(intro_frame, text="Login", width=15, command=lambda:raise_frame(login_frame))
 intro_login_button.grid(row=6, column=2, columnspan=3, padx=10, pady=10)
 intro_register_button = Button(intro_frame, text="Register New User", width=15, command=check_register_viability)
-intro_register_button.grid(row=6, column=7, columnspan=3, padx=10, pady=10)
+intro_register_button.grid(row=6, column=6, columnspan=3, padx=10, pady=10)
+
 raise_frame(intro_frame)
 
 
 
 #login_frame
 login_title_label = Label(login_frame, text="Login", fg = "red", font = "Helvetica 16 bold italic", justify="center")
-login_title_label.grid(row=0, column=3, columnspan=6, pady=20)
+login_title_label.grid(row=0, column=3, columnspan=9)
 
 username_label = Label(login_frame, text="Username", font = "Helvetica 12", justify="center")
 username_label.grid(row=2, column=0, columnspan=2)
 login_username = StringVar()
 username_field = Entry(login_frame, textvariable=login_username)
-username_field.grid(row=2, column=2, columnspan=5)
+username_field.grid(row=2, column=2, columnspan=8)
 
 password_label = Label(login_frame, text="Password", font = "Helvetica 12", justify="center")
 password_label.grid(row=3, column=0, columnspan=2)
 login_password = StringVar()
-username_field = Entry(login_frame, textvariable=login_password)
-username_field.grid(row=3, column=2, columnspan=5)
+password_field = Entry(login_frame, textvariable=login_password, show="*")
+password_field.grid(row=3, column=2, columnspan=8)
 
 login_button = Button(login_frame, text="Login", width=15, command=login)
 login_button.grid(row=4, column=2, columnspan=3, padx=10, pady=10)
@@ -76,8 +97,8 @@ login_back_button.grid(row=4, column=7, columnspan=3, padx=10, pady=10)
 
 
 #register_frame
-register_title_label = Label(register_frame, text="Login", fg = "red", font = "Helvetica 16 bold italic", justify="center")
-register_title_label.grid(row=0, column=3, columnspan=6, pady=20)
+register_title_label = Label(register_frame, text="Register New User", fg = "red", font = "Helvetica 16 bold italic", justify="center")
+register_title_label.grid(row=0, column=3, columnspan=8, pady=20)
 
 register_username_label = Label(register_frame, text="Username", font = "Helvetica 12", justify="center")
 register_username_label.grid(row=2, column=0, columnspan=2)
