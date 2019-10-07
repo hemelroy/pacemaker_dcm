@@ -3,6 +3,8 @@ from PIL import ImageTk, Image
 import sqlite3
 import db_operations
 
+user_id = -1
+
 def raise_frame(frame):
     frame.tkraise()
 
@@ -11,7 +13,7 @@ def check_register_viability():
     
     if is_full:
         full_label = Label(intro_frame, text="Max number of users allowed to be registered has been reached.", fg="red", font="Helvetica 14", justify="center")
-        full_label.grid(row=7, column=4, columnspan=4)
+        full_label.grid(row=7, column=3, columnspan=6)
     else:
         raise_frame(register_frame)
 
@@ -23,7 +25,22 @@ def login():
     if not user and not password:
         print("Missing fields")
     else:
-        db_operations.login_user(user, password)
+        global user_id
+        user_id, params = db_operations.login_user(user, password)
+        uppRateInterval_field
+        lowRateInterval_field.delete(0, END) #deletes the current value
+        lowRateInterval_field.insert(0, params[1])
+        uppRateInterval_field.delete(0, END)
+        uppRateInterval_field.insert(0, params[2])
+        vPaceAmp_field.delete(0, END)
+        vPaceAmp_field.insert(0, params[3])
+        vPulseWidth_field.delete(0, END)
+        vPulseWidth_field.insert(0, params[4])
+        aPaceAmp_field.delete(0, END)
+        aPaceAmp_field.insert(0, params[5])
+        aPulseWidth_field.delete(0, END)
+        aPulseWidth_field.insert(0, params[6])
+        raise_frame(params_frame)
 
     #call db function to check if user exists
 
@@ -41,10 +58,49 @@ def register():
     if not user or not password:
         print("flop")
     else:
-        userid = db_operations.register_user(user, password)
-        db_operations.add_attributes(userid, 50, 50, )
-        raise_frame(params_frame)        
+        global user_id
+        user_id = db_operations.register_user(user, password)
+        db_operations.add_attribute(user_id, 50, 50, 50, 50, 50, 50)
+        raise_frame(params_frame)
+        parameter_list = db_operations.get_attributes(user_id)
+        print(parameter_list)
+        lowRateInterval_field.delete(0, END) #deletes the current value
+        lowRateInterval_field.insert(0, parameter_list[1])
+        uppRateInterval_field.delete(0, END)
+        uppRateInterval_field.insert(0, parameter_list[2])
+        vPaceAmp_field.delete(0, END)
+        vPaceAmp_field.insert(0, parameter_list[3])
+        vPulseWidth_field.delete(0, END)
+        vPulseWidth_field.insert(0, parameter_list[4])
+        aPaceAmp_field.delete(0, END)
+        aPaceAmp_field.insert(0, parameter_list[5])
+        aPulseWidth_field.delete(0, END)
+        aPulseWidth_field.insert(0, parameter_list[6])
 
+def update_params():
+    parameterlist = []
+    parameterlist.append(lowRateInterval_field.get())
+    parameterlist.append(uppRateInterval_field.get())
+    parameterlist.append(vPaceAmp_field.get())
+    parameterlist.append(vPulseWidth_field.get())
+    parameterlist.append(aPaceAmp_field.get())
+    parameterlist.append(aPulseWidth_field.get())
+    global user_id
+    db_operations.update_attribute(user_id, parameterlist)
+
+def logout():
+    raise_frame(intro_frame)
+    lowRateInterval_field.delete(0, END) #deletes the current value
+    uppRateInterval_field.delete(0, END)
+    vPaceAmp_field.delete(0, END)
+    vPulseWidth_field.delete(0, END)
+    aPaceAmp_field.delete(0, END)
+    aPulseWidth_field.delete(0, END)
+    register_username_field.delete(0, END)
+    register_password_field.delete(0, END)
+    username_field.delete(0, END)
+    password_field.delete(0, END)
+    
 
 
 window = Tk()
@@ -92,8 +148,8 @@ password_field.grid(row=3, column=2, columnspan=8)
 
 login_button = Button(login_frame, text="Login", width=15, command=login)
 login_button.grid(row=4, column=2, columnspan=3, padx=10, pady=10)
-login_back_button = Button(login_frame, text="Back", width=15, command=lambda:raise_frame(intro_frame))
-login_back_button.grid(row=4, column=7, columnspan=3, padx=10, pady=10)
+back_login_button = Button(login_frame, text="Back", width=15, command=lambda:raise_frame(intro_frame))
+back_login_button.grid(row=4, column=7, columnspan=3, padx=10, pady=10)
 
 
 #register_frame
@@ -109,7 +165,7 @@ register_username_field.grid(row=2, column=2, columnspan=5)
 register_password_label = Label(register_frame, text="Password", font = "Helvetica 12", justify="center")
 register_password_label.grid(row=3, column=0, columnspan=2)
 register_password = StringVar()
-register_password_field = Entry(register_frame, textvariable=register_password)
+register_password_field = Entry(register_frame, textvariable=register_password, show="*")
 register_password_field.grid(row=3, column=2, columnspan=5)
 
 register_button = Button(register_frame, text="Register", width=15, command=register)
@@ -168,10 +224,10 @@ aPulseWidth = StringVar()
 aPulseWidth_field = Entry(params_frame, textvariable=aPulseWidth)
 aPulseWidth_field.grid(row=8, column=2, columnspan=5)
 
-update_button = Button(params_frame, text="Update", width=15, command=register)
+update_button = Button(params_frame, text="Update", width=15, command=update_params)
 update_button.grid(row=9, column=2, columnspan=3, padx=10, pady=10)
-params_back_button = Button(params_frame, text="Back", width=15, command=lambda:raise_frame(login_frame))
-params_back_button.grid(row=9, column=7, columnspan=3, padx=10, pady=10)
+logout_button = Button(params_frame, text="Logout", width=15, command=logout)
+logout_button.grid(row=9, column=7, columnspan=3, padx=10, pady=10)
 
 
 window.mainloop()
