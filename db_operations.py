@@ -54,9 +54,27 @@ def database_fetch():
 	rows = cur.fetchall()
 	for row in rows:
 		print(row)
+
+#check if existing user exists. If so, log them in
+def login_user(user, password):
+	conn=sqlite3.connect("records.db")
+	cur=conn.cursor()
+	cur.execute("SELECT EXISTS(SELECT 1 FROM Users WHERE username=? AND password=?)", (user, password))
+	exists = cur.fetchall()[0][0]
+	if exists:
+		cur.execute("SELECT user_id FROM Users WHERE username=? AND password=?", (user, password)) 
+		id = cur.fetchall()[0][0]
+		cur.execute("SELECT * FROM Attributes WHERE user_id=?", (id,)) 
+		parameters = cur.fetchall()[0]
+		print(parameters)
+		return parameters
+	else:
+		return ()
+	conn.close()
+
 		
 connect()
-myID = register_user('shaika27','myPass')
-add_attribute(myID, '3.9','2.1')
-database_fetch()
+#myID = register_user('hemel','myPass')
+#add_attribute(5, '3.9','2.1')
+#database_fetch()
 
