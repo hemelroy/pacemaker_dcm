@@ -47,6 +47,14 @@ def update_attribute(id, parameters):
 	cur.execute("Update Attributes set lrLimit=?, urLimit=?,vAmplitude=?,vPWidth=?, aAmplitude=?,aPWidth=? where user_id = ?",(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4],parameters[5],id))
 	conn.commit()
 	conn.close()
+
+def get_attributes(user_id):
+	conn=sqlite3.connect('records.db')
+	cur=conn.cursor()
+	cur.execute("SELECT * FROM Attributes WHERE user_id=?", (user_id,))
+	params = cur.fetchall()[0]
+	conn.close() 
+	return params
 	
 def database_fetch():
 	conn=sqlite3.connect("records.db")
@@ -72,9 +80,9 @@ def login_user(user, password):
 		cur.execute("SELECT * FROM Attributes WHERE user_id=?", (id,)) 
 		parameters = cur.fetchall()[0]
 		print(parameters)
-		return parameters
+		return id, parameters
 	else:
-		return ()
+		return -1, ()
 	conn.close()
 
 		
