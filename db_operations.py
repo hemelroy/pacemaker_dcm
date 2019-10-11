@@ -22,6 +22,16 @@ def check_user_count():
 
 	return is_full
 
+def check_if_exists(user):
+	conn=sqlite3.connect("records.db")
+	cur=conn.cursor()
+	cur.execute("SELECT EXISTS(SELECT 1 FROM Users WHERE username=?)", (user,))
+	exists = cur.fetchall()[0][0]
+	if exists:
+		return False
+	return True
+	conn.close()
+
 
 def register_user(r_username, r_password):
 	conn=sqlite3.connect("records.db")
@@ -87,10 +97,10 @@ def login_user(user, password):
 
 		
 connect()
-myID = register_user('hemel','myPass')
-add_attribute(1, '1.1','2.2','3.3','4.4','5.5','6.6')
-database_fetch()
-parameter_list = ['1.9','1.2','3.7','4.4','3.5','7.7']
-update_attribute(1,parameter_list)
-database_fetch()
+# myID = register_user('hemel','myPass')
+# add_attribute(1, '1.1','2.2','3.3','4.4','5.5','6.6')
+# database_fetch()
+# parameter_list = ['1.9','1.2','3.7','4.4','3.5','7.7']
+# update_attribute(1,parameter_list)
+# database_fetch()
 
