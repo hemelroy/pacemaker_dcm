@@ -6,7 +6,7 @@ from PIL import ImageTk, Image
 import sqlite3
 import db_operations
 
-############ Global variables ############
+############ Global non-widget variables ############
 user_id = -1
 
 ############ Functions ############
@@ -118,7 +118,7 @@ def logout():
     password_field.delete(0, END)
     remove_error_messages()
 
-def back_from_login():
+def login_to_intro():
     raise_frame(intro_frame)
     remove_error_messages()
     username_field.delete(0, END)
@@ -151,8 +151,8 @@ for frame in (intro_frame, login_frame, register_frame, params_frame):
 ############ Widget Configuration ############
 ##intro_frame##
 #Background image
-img = ImageTk.PhotoImage(Image.open("texture.png"))
-intro_panel = Label(intro_frame, image = img)
+intro_img = ImageTk.PhotoImage(Image.open("texture.png"))
+intro_panel = Label(intro_frame, image = intro_img)
 intro_panel.place(x=0, y=0, relwidth=1, relheight=1)
 #Title
 intro_title_label = Label(intro_frame, text="Elite Beat Pacemaker Device Control Monitor", fg = "red", bg="black", font = "Helvetica 16 bold italic", justify="center", padx=370, pady=100)
@@ -189,7 +189,7 @@ password_field.place(relx=0.6, rely=0.5, anchor=CENTER)
 #Buttons
 login_button = Button(login_frame, text="Login", width=15, command=login)
 login_button.place(relx=0.4, rely=0.6, anchor=CENTER)
-back_login_button = Button(login_frame, text="Back", width=15, command=back_from_login)
+back_login_button = Button(login_frame, text="Back", width=15, command=login_to_intro)
 back_login_button.place(relx=0.6, rely=0.6, anchor=CENTER)
 #Error labels
 unidentified_user_label = Label(login_frame, text="Did not recognize this username and password combination", font = "Helvetica 12", justify="center")
