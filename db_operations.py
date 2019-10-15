@@ -1,5 +1,6 @@
 import sqlite3
 
+#setup and connect to database
 def connect():
 	conn=sqlite3.connect("records.db")
 	cur=conn.cursor()
@@ -11,7 +12,6 @@ def connect():
 #Check if more than 10 users have been registered
 def check_user_count():
 	is_full = True
-
 	conn=sqlite3.connect("records.db")
 	cur=conn.cursor()
 	cur.execute("SELECT COUNT(*) FROM Users")
@@ -19,9 +19,9 @@ def check_user_count():
 	if count <= 10:
 		is_full = False
 	conn.close()
-
 	return is_full
 
+#Check if user already exists in database
 def check_if_exists(user):
 	conn=sqlite3.connect("records.db")
 	cur=conn.cursor()
@@ -32,7 +32,7 @@ def check_if_exists(user):
 	return True
 	conn.close()
 
-
+#Add user to database
 def register_user(r_username, r_password):
 	conn=sqlite3.connect("records.db")
 	cur=conn.cursor()
@@ -43,7 +43,8 @@ def register_user(r_username, r_password):
 	conn.commit()
 	conn.close()
 	return id
-	
+
+#Insert user's programmable parameters	
 def add_attribute(id,lrLimit, urLimit, vAmplitude, vPWidth,aAmplitude, aPWidth):
 	conn=sqlite3.connect("records.db")
 	cur=conn.cursor()
@@ -51,6 +52,7 @@ def add_attribute(id,lrLimit, urLimit, vAmplitude, vPWidth,aAmplitude, aPWidth):
 	conn.commit()
 	conn.close()
 
+#Update programmable parameter values
 def update_attribute(id, parameters):
 	conn=sqlite3.connect('records.db')
 	cur=conn.cursor()
@@ -58,6 +60,7 @@ def update_attribute(id, parameters):
 	conn.commit()
 	conn.close()
 
+#Fetch stored parameter values
 def get_attributes(user_id):
 	conn=sqlite3.connect('records.db')
 	cur=conn.cursor()
@@ -65,20 +68,8 @@ def get_attributes(user_id):
 	params = cur.fetchall()[0]
 	conn.close() 
 	return params
-	
-def database_fetch():
-	conn=sqlite3.connect("records.db")
-	cur=conn.cursor()
-	cur.execute('SELECT * FROM Users')
-	rows = cur.fetchall()
-	for row in rows:
-		print(row)
-	cur.execute('SELECT * FROM Attributes')
-	rows = cur.fetchall()
-	for row in rows:
-		print(row)
 
-#check if existing user exists. If so, log them in
+#Check if existing user exists. If so, indicate they can be logged in
 def login_user(user, password):
 	conn=sqlite3.connect("records.db")
 	cur=conn.cursor()
@@ -95,6 +86,17 @@ def login_user(user, password):
 		return -1, ()
 	conn.close()
 
+def database_fetch():
+	conn=sqlite3.connect("records.db")
+	cur=conn.cursor()
+	cur.execute('SELECT * FROM Users')
+	rows = cur.fetchall()
+	for row in rows:
+		print(row)
+	cur.execute('SELECT * FROM Attributes')
+	rows = cur.fetchall()
+	for row in rows:
+		print(row)
 		
 connect()
 # myID = register_user('hemel','myPass')
