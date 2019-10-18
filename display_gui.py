@@ -151,17 +151,14 @@ for frame in (intro_frame, login_frame, register_frame, params_frame):
 ############ Widget Configuration ############
 ##intro_frame##
 #Background image
-intro_img = ImageTk.PhotoImage(Image.open("texture.png"))
+intro_img = ImageTk.PhotoImage(Image.open("TitlePage.png"))
 intro_panel = Label(intro_frame, image = intro_img)
 intro_panel.place(x=0, y=0, relwidth=1, relheight=1)
-#Title
-intro_title_label = Label(intro_frame, text="Elite Beat Pacemaker Device Control Monitor", fg = "red", bg="black", font = "Helvetica 16 bold italic", justify="center", padx=370, pady=100)
-intro_title_label.grid(row=0, column=3, columnspan=12, pady=20, sticky=N+S+E+W)
 #Buttons
 intro_login_button = Button(intro_frame, text="Login", width=15, command=lambda:raise_frame(login_frame))
-intro_login_button.place(relx=0.4, rely=0.5, anchor=CENTER)
+intro_login_button.place(relx=0.3, rely=0.5, anchor=CENTER)
 intro_register_button = Button(intro_frame, text="Register New User", width=15, command=check_register_viability)
-intro_register_button.place(relx=0.6, rely=0.5, anchor=CENTER)
+intro_register_button.place(relx=0.7, rely=0.5, anchor=CENTER)
 #Error Labels
 full_label = Label(intro_frame, text="Max number of users allowed to be registered has been reached.", fg="red", font="Helvetica 14", justify="center")
 raise_frame(intro_frame)
