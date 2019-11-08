@@ -1,3 +1,5 @@
+#baud rate: 115200 bits/sec
+
 #UI 
 from tkinter import *
 from tkinter import ttk
@@ -8,7 +10,8 @@ import db_operations
 
 ############ Global non-widget variables ############
 user_id = -1
-
+pacingModes = ["VOO", "AOO", "AAI", "VVI"]
+numofModes = len(pacingModes) - 1
 ############ Functions ############
 #switch screens
 def raise_frame(frame):
@@ -103,6 +106,7 @@ def update_params():
     parameterlist.append(aPulseWidth_field.get())
     global user_id
     db_operations.update_attribute(user_id, parameterlist)
+    update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update was successful
 
 def logout():
     raise_frame(intro_frame)
@@ -130,6 +134,45 @@ def register_to_intro():
     register_username_field.delete(0, END)
     register_password_field.delete(0, END)
 
+#change parameter input display when pace mode changes
+def update_params_page(direction):
+    update_label.place(relx=2, rely=0.6, anchor=CENTER) #remove update label from frame
+    global pacingModeOptionCount, pacingModeOptionText, pacingModes, numofModes 
+    if direction == 1: #cycle right
+            if pacingModeOptionCount == numofModes: #cycle through modes at the end
+                    pacingModeOptionCount = 0
+            else:
+                    pacingModeOptionCount += 1
+    elif direction == -1: #cycle left
+            if pacingModeOptionCount == 0: #cycle through modes at the end
+                    pacingModeOptionCount = numofModes
+            else:
+                    pacingModeOptionCount -= 1
+    pacingModeOption['text'] = pacingModes[pacingModeOptionCount]
+    if (pacingModeOptionCount == 0 or pacingModeOptionCount == 3):
+            placeVentricle()
+    elif (pacingModeOptionCount == 1 or pacingModeOptionCount == 2):
+            placeAtrial()
+
+def placeVentricle():
+	vPaceAmp_label.place(relx=0.4, rely=0.35, anchor=CENTER)
+	vPulseWidth_label.place(relx=0.4, rely=0.4, anchor=CENTER)
+	vPaceAmp_field.place(relx=0.6, rely=0.35, anchor=CENTER)
+	vPulseWidth_field.place(relx=0.6, rely=0.40, anchor=CENTER)
+	aPaceAmp_label.place(relx=2, rely=0.45, anchor=CENTER)
+	aPulseWidth_label.place(relx=2, rely=0.5, anchor=CENTER)
+	aPaceAmp_field.place(relx=2, rely=0.45, anchor=CENTER)
+	aPulseWidth_field.place(relx=2, rely=0.50, anchor=CENTER)
+	
+def placeAtrial():
+	vPaceAmp_label.place(relx=2, rely=0.35, anchor=CENTER)
+	vPulseWidth_label.place(relx=2, rely=0.4, anchor=CENTER)
+	vPaceAmp_field.place(relx=2, rely=2, anchor=CENTER)
+	vPulseWidth_field.place(relx=2, rely=2, anchor=CENTER)
+	aPaceAmp_label.place(relx=0.4, rely=0.45, anchor=CENTER)
+	aPulseWidth_label.place(relx=0.4, rely=0.5, anchor=CENTER)
+	aPaceAmp_field.place(relx=0.6, rely=0.45, anchor=CENTER)
+	aPulseWidth_field.place(relx=0.6, rely=0.50, anchor=CENTER)
 ############ Window Configuration ############
 window = Tk()
 window.geometry("1280x720")
@@ -163,7 +206,6 @@ intro_register_button.place(relx=0.7, rely=0.5, anchor=CENTER)
 full_label = Label(intro_frame, text="Max number of users allowed to be registered has been reached.", fg="red", font="Helvetica 14", justify="center")
 raise_frame(intro_frame)
 
-
 ##login_frame##
 #Background image
 login_panel = Label(login_frame, image = texture_img)
@@ -191,7 +233,6 @@ back_login_button.place(relx=0.6, rely=0.6, anchor=CENTER)
 #Error labels
 unidentified_user_label = Label(login_frame, text="Did not recognize this username and password combination", font = "Helvetica 12", justify="center")
 login_missingfield_label = Label(login_frame, text="Username or password field is empty", font="Helvetica 12", justify="center")
-
 
 #register_frame
 #Background image
@@ -221,7 +262,6 @@ register_back_button.place(relx=0.6, rely=0.6, anchor=CENTER)
 register_missingfield_label = Label(register_frame, text="Username or password is missing", bg="#31749b", fg="orange", font="Helvetica 12 bold", justify="center")
 register_existinguser_label = Label(register_frame, text="Username chosen already exists", bg="#31749b", fg="orange", font="Helvetica 12 bold", justify="center")
 
-
 ##params_frame##
 #Background image
 params_panel = Label(params_frame, image = texture_img)
@@ -233,11 +273,18 @@ params_title_label.place(relx=0.5, rely=0.1, anchor=CENTER)
 #default = StringVar(params_frame)
 #default.set("VOO") # default value
 #pacingModeOption = OptionMenu(params_frame, default, "VOO", "AOO", "AAI", "VVI")
-pacingModes = ["VOO", "AOO", "AAI", "VVI"]
-box_value = StringVar()
-pacingModeOption=ttk.Combobox(params_frame, values=pacingModes, width=20, state="readonly", textvariable=box_value)
-pacingModeOption.current(0)
+# pacingModes = ["VOO", "AOO", "AAI", "VVI"]
+# box_value = StringVar()
+# pacingModeOption=ttk.Combobox(params_frame, values=pacingModes, width=20, state="readonly", textvariable=box_value)
+# pacingModeOption.current(0)
+# pacingModeOption.place(relx=0.5, rely=0.2, anchor=CENTER)
+
+#Pacing Mode Initial Option
+pacingModeOptionCount = 0
+pacingModeOptionText = "VOO"
+pacingModeOption = Label(params_frame , text = pacingModeOptionText, fg = "white", bg="#31749b", font = "Helvetica 12")
 pacingModeOption.place(relx=0.5, rely=0.2, anchor=CENTER)
+
 #Lower Rate Interval
 lowRateInterval_label = Label(params_frame, text="Lower Rate Limit:", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
 lowRateInterval_label.place(relx=0.4, rely=0.25, anchor=CENTER)
@@ -264,24 +311,29 @@ vPulseWidth_field = Entry(params_frame, textvariable=vPulseWidth)
 vPulseWidth_field.place(relx=0.6, rely=0.4, anchor=CENTER)
 #Atrial pace amplitude
 aPaceAmp_label = Label(params_frame, text="Atrial Amplitude:", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
-aPaceAmp_label.place(relx=0.4, rely=0.45, anchor=CENTER)
+aPaceAmp_label.place(relx=2, rely=0.45, anchor=CENTER)
 aPaceAmp = StringVar()
 aPaceAmp_field = Entry(params_frame, textvariable=aPaceAmp)
-aPaceAmp_field.place(relx=0.6, rely=0.45, anchor=CENTER)
+aPaceAmp_field.place(relx=2, rely=0.45, anchor=CENTER)
 #Atrial pulse width
 aPulseWidth_label = Label(params_frame, text="Atrial Pulse Width:", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
-aPulseWidth_label.place(relx=0.4, rely=0.5, anchor=CENTER)
+aPulseWidth_label.place(relx=2, rely=0.5, anchor=CENTER)
 aPulseWidth = StringVar()
 aPulseWidth_field = Entry(params_frame, textvariable=aPulseWidth)
-aPulseWidth_field.place(relx=0.6, rely=0.5, anchor=CENTER)
+aPulseWidth_field.place(relx=2, rely=0.5, anchor=CENTER)
 #Buttons
 update_button = Button(params_frame, text="Update", width=15, command=update_params)
 update_button.place(relx=0.4, rely=0.6, anchor=CENTER)
+modeRight_button = Button(params_frame, text="->", width=5, command= lambda: update_params_page(1))
+modeRight_button.place(relx=0.6, rely=0.2, anchor=CENTER)
+modeLeft_button = Button(params_frame, text="<-", width=5, command= lambda: update_params_page(-1))
+modeLeft_button.place(relx=0.4, rely=0.2, anchor=CENTER)
 logout_button = Button(params_frame, text="Logout", width=15, command=logout)
 logout_button.place(relx=0.6, rely=0.6, anchor=CENTER)
 #Indicator Labels
 communication_label = Label(params_frame, text="Communicating with pacemaker: No", font = "Helvetica 12", justify="left")
 communication_label.place(relx=0.5, rely=0.7, anchor=CENTER)
 unexpectedConn_label = Label(params_frame, text="--Unexpected Pacemaker Device Detected--", font = "Helvetica 12", justify="left")
+update_label = Label(params_frame, text="Update Complete", font = "Helvetica 12", justify="center")
 
 window.mainloop()
