@@ -56,11 +56,13 @@ def login():
             unidentified_user_label.place(relx=0.5, rely=0.8, anchor=CENTER)
 
 def remove_error_messages():
-    unidentified_user_label.place(relx=2, rely=2)
-    register_missingfield_label.place(relx=2, rely=2)
-    register_existinguser_label.place(relx=2, rely=2)
-    full_label.place(relx=2, rely=2)
-    login_missingfield_label.place(relx=2, rely=2)
+	unidentified_user_label.place(relx=2, rely=2)
+	register_missingfield_label.place(relx=2, rely=2)
+	register_existinguser_label.place(relx=2, rely=2)
+	full_label.place(relx=2, rely=2)
+	login_missingfield_label.place(relx=2, rely=2)
+	update_label.place(relx=2, rely=0.6, anchor=CENTER) #remove update label from parameter frame
+	no_update_label.place(relx=2, rely=0.6, anchor=CENTER) #remove no update label from parameter frame
 
 def to_login():
     raise_frame(login_frame)
@@ -97,16 +99,21 @@ def register():
             register_existinguser_label.place(relx=0.5, rely=0.85, anchor=CENTER)
 
 def update_params():
-    parameterlist = []
-    parameterlist.append(lowRateInterval_field.get())
-    parameterlist.append(uppRateInterval_field.get())
-    parameterlist.append(vPaceAmp_field.get())
-    parameterlist.append(vPulseWidth_field.get())
-    parameterlist.append(aPaceAmp_field.get())
-    parameterlist.append(aPulseWidth_field.get())
-    global user_id
-    db_operations.update_attribute(user_id, parameterlist)
-    update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update was successful
+	global user_id
+	parameterlist = []
+	update=(0 <= int(lowRateInterval_field.get()) <= 100 and 0 <= int(uppRateInterval_field.get()) <= 100 and 0 <= int(vPaceAmp_field.get()) <= 100 and 0 <= int(vPulseWidth_field.get()) <= 100 and 0 <= int(aPaceAmp_field.get()) <= 100 and 0 <= int(aPulseWidth_field.get()) <= 100)
+	if update:
+		parameterlist.append(lowRateInterval_field.get())
+		parameterlist.append(uppRateInterval_field.get())
+		parameterlist.append(vPaceAmp_field.get())
+		parameterlist.append(vPulseWidth_field.get())
+		parameterlist.append(aPaceAmp_field.get())
+		parameterlist.append(aPulseWidth_field.get())
+		db_operations.update_attribute(user_id, parameterlist)
+		no_update_label.place(relx=2, rely=0.65, anchor=CENTER) #show update failed
+		update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update was successful
+	else:
+		no_update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update failed
 
 def logout():
     raise_frame(intro_frame)
@@ -136,23 +143,24 @@ def register_to_intro():
 
 #change parameter input display when pace mode changes
 def update_params_page(direction):
-    update_label.place(relx=2, rely=0.6, anchor=CENTER) #remove update label from frame
-    global pacingModeOptionCount, pacingModeOptionText, pacingModes, numofModes 
-    if direction == 1: #cycle right
-            if pacingModeOptionCount == numofModes: #cycle through modes at the end
-                    pacingModeOptionCount = 0
-            else:
-                    pacingModeOptionCount += 1
-    elif direction == -1: #cycle left
-            if pacingModeOptionCount == 0: #cycle through modes at the end
-                    pacingModeOptionCount = numofModes
-            else:
-                    pacingModeOptionCount -= 1
-    pacingModeOption['text'] = pacingModes[pacingModeOptionCount]
-    if (pacingModeOptionCount == 0 or pacingModeOptionCount == 3):
-            placeVentricle()
-    elif (pacingModeOptionCount == 1 or pacingModeOptionCount == 2):
-            placeAtrial()
+	update_label.place(relx=2, rely=0.6, anchor=CENTER) #remove update label from frame
+	no_update_label.place(relx=2, rely=0.6, anchor=CENTER) #remove no update label from frame
+	global pacingModeOptionCount, pacingModeOptionText, pacingModes, numofModes 
+	if direction == 1: #cycle right
+		if pacingModeOptionCount == numofModes: #cycle through modes at the end
+			pacingModeOptionCount = 0
+		else:
+			pacingModeOptionCount += 1
+	elif direction == -1: #cycle left
+		if pacingModeOptionCount == 0: #cycle through modes at the end
+			pacingModeOptionCount = numofModes
+		else:
+			pacingModeOptionCount -= 1
+	pacingModeOption['text'] = pacingModes[pacingModeOptionCount]
+	if (pacingModeOptionCount == 0 or pacingModeOptionCount == 3):
+		placeVentricle()
+	elif (pacingModeOptionCount == 1 or pacingModeOptionCount == 2):
+		placeAtrial()
 
 def placeVentricle():
 	vPaceAmp_label.place(relx=0.4, rely=0.35, anchor=CENTER)
@@ -173,6 +181,7 @@ def placeAtrial():
 	aPulseWidth_label.place(relx=0.4, rely=0.5, anchor=CENTER)
 	aPaceAmp_field.place(relx=0.6, rely=0.45, anchor=CENTER)
 	aPulseWidth_field.place(relx=0.6, rely=0.50, anchor=CENTER)
+	
 ############ Window Configuration ############
 window = Tk()
 window.geometry("1280x720")
@@ -335,5 +344,7 @@ communication_label = Label(params_frame, text="Communicating with pacemaker: No
 communication_label.place(relx=0.5, rely=0.7, anchor=CENTER)
 unexpectedConn_label = Label(params_frame, text="--Unexpected Pacemaker Device Detected--", font = "Helvetica 12", justify="left")
 update_label = Label(params_frame, text="Update Complete", font = "Helvetica 12", justify="center")
-
+update_label.place(relx=2, rely=0.6, anchor=CENTER) #remove update label from frame
+no_update_label = Label(params_frame, text="Update Not Complete: Values were out of range!", font = "Helvetica 12", justify="center")
+no_update_label.place(relx=2, rely=0.6, anchor=CENTER) #remove no update label from frame
 window.mainloop()
