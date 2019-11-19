@@ -7,7 +7,8 @@ from PIL import ImageTk, Image
 #database
 import sqlite3
 import db_operations
-import serial
+import serialComm
+from serialComm import ser
 
 ############ Global non-widget variables ############
 user_id = -1
@@ -81,7 +82,7 @@ def register():
         is_new_user = db_operations.check_if_exists(user)
         if is_new_user:
             user_id = db_operations.register_user(user, password)
-            db_operations.add_attribute(user_id, 50, 50, 50, 50, 50, 50)
+            db_operations.add_attribute(user_id, 60, 180, 50, 10, 50, 10)
             raise_frame(params_frame)
             parameter_list = db_operations.get_attributes(user_id)
             print(parameter_list)
@@ -104,7 +105,7 @@ def update_params():
 	global user_id, confirmMode
 	if confirmMode == True:
 		parameterlist = []
-		update=(0 <= int(lowRateInterval_field.get()) <= 100 and 0 <= int(uppRateInterval_field.get()) <= 100 and 0 <= int(vPaceAmp_field.get()) <= 100 and 0 <= int(vPulseWidth_field.get()) <= 100 and 0 <= int(aPaceAmp_field.get()) <= 100 and 0 <= int(aPulseWidth_field.get()) <= 100)
+		update=(30 <= int(lowRateInterval_field.get()) <= 90 and 90 <= int(uppRateInterval_field.get()) <= 180 and 0 <= int(vPaceAmp_field.get()) <= 100 and 1 <= int(vPulseWidth_field.get()) <= 100 and 0 <= int(aPaceAmp_field.get()) <= 100 and 1 <= int(aPulseWidth_field.get()) <= 100)
 		if update:
 			parameterlist.append(lowRateInterval_field.get())
 			parameterlist.append(uppRateInterval_field.get())
@@ -113,7 +114,7 @@ def update_params():
 			parameterlist.append(aPaceAmp_field.get())
 			parameterlist.append(aPulseWidth_field.get())
 			db_operations.update_attribute(user_id, parameterlist)
-			serial.serialTransmit(parameterlist)
+			serialComm.serialTransmit(parameterlist)
 			no_update_label.place(relx=2, rely=0.65, anchor=CENTER) #show update failed
 			update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update was successful
 		else:
