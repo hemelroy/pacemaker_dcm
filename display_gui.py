@@ -1,6 +1,6 @@
 #baud rate: 115200 bits/sec
 
-#UI 
+#UI
 from tkinter import *
 from tkinter import ttk
 from PIL import ImageTk, Image
@@ -20,7 +20,7 @@ def raise_frame(frame):
 #determine if max number of users is registered
 def check_register_viability():
     is_full = db_operations.check_user_count()
-    
+
     if is_full:
         full_label.place(relx=0.5, rely=0.7, anchor=CENTER)
     else:
@@ -39,7 +39,7 @@ def login():
 
         if params:
             uppRateInterval_field
-            lowRateInterval_field.delete(0, END) 
+            lowRateInterval_field.delete(0, END)
             lowRateInterval_field.insert(0, params[1])
             uppRateInterval_field.delete(0, END)
             uppRateInterval_field.insert(0, params[2])
@@ -79,7 +79,7 @@ def register():
         is_new_user = db_operations.check_if_exists(user)
         if is_new_user:
             user_id = db_operations.register_user(user, password)
-            db_operations.add_attribute(user_id, 50, 50, 50, 50, 50, 50)
+            db_operations.add_attribute(user_id, 60, 180, 50, 10, 50, 10)
             raise_frame(params_frame)
             parameter_list = db_operations.get_attributes(user_id)
             print(parameter_list)
@@ -145,7 +145,7 @@ def register_to_intro():
 def update_params_page(direction):
 	update_label.place(relx=2, rely=0.6, anchor=CENTER) #remove update label from frame
 	no_update_label.place(relx=2, rely=0.6, anchor=CENTER) #remove no update label from frame
-	global pacingModeOptionCount, pacingModeOptionText, pacingModes, numofModes 
+	global pacingModeOptionCount, pacingModeOptionText, pacingModes, numofModes
 	if direction == 1: #cycle right
 		if pacingModeOptionCount == numofModes: #cycle through modes at the end
 			pacingModeOptionCount = 0
@@ -171,7 +171,7 @@ def placeVentricle():
 	aPulseWidth_label.place(relx=2, rely=0.5, anchor=CENTER)
 	aPaceAmp_field.place(relx=2, rely=0.45, anchor=CENTER)
 	aPulseWidth_field.place(relx=2, rely=0.50, anchor=CENTER)
-	
+
 def placeAtrial():
 	vPaceAmp_label.place(relx=2, rely=0.35, anchor=CENTER)
 	vPulseWidth_label.place(relx=2, rely=0.4, anchor=CENTER)
@@ -181,7 +181,7 @@ def placeAtrial():
 	aPulseWidth_label.place(relx=0.4, rely=0.5, anchor=CENTER)
 	aPaceAmp_field.place(relx=0.6, rely=0.45, anchor=CENTER)
 	aPulseWidth_field.place(relx=0.6, rely=0.50, anchor=CENTER)
-	
+
 ############ Window Configuration ############
 window = Tk()
 window.geometry("1280x720")
