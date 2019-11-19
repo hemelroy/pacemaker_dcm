@@ -7,11 +7,13 @@ from PIL import ImageTk, Image
 #database
 import sqlite3
 import db_operations
+import serial
 
 ############ Global non-widget variables ############
 user_id = -1
 pacingModes = ["VOO", "AOO", "AAI", "VVI"]
 numofModes = len(pacingModes) - 1
+confirmMode = True
 ############ Functions ############
 #switch screens
 def raise_frame(frame):
@@ -99,22 +101,28 @@ def register():
             register_existinguser_label.place(relx=0.5, rely=0.85, anchor=CENTER)
 
 def update_params():
-	global user_id
-	parameterlist = []
-	update=(0 <= int(lowRateInterval_field.get()) <= 100 and 0 <= int(uppRateInterval_field.get()) <= 100 and 0 <= int(vPaceAmp_field.get()) <= 100 and 0 <= int(vPulseWidth_field.get()) <= 100 and 0 <= int(aPaceAmp_field.get()) <= 100 and 0 <= int(aPulseWidth_field.get()) <= 100)
-	if update:
-		parameterlist.append(lowRateInterval_field.get())
-		parameterlist.append(uppRateInterval_field.get())
-		parameterlist.append(vPaceAmp_field.get())
-		parameterlist.append(vPulseWidth_field.get())
-		parameterlist.append(aPaceAmp_field.get())
-		parameterlist.append(aPulseWidth_field.get())
-		db_operations.update_attribute(user_id, parameterlist)
-		no_update_label.place(relx=2, rely=0.65, anchor=CENTER) #show update failed
-		update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update was successful
-	else:
+	global user_id, confirmMode
+	if confirmMode == True:
+		parameterlist = []
+		update=(0 <= int(lowRateInterval_field.get()) <= 100 and 0 <= int(uppRateInterval_field.get()) <= 100 and 0 <= int(vPaceAmp_field.get()) <= 100 and 0 <= int(vPulseWidth_field.get()) <= 100 and 0 <= int(aPaceAmp_field.get()) <= 100 and 0 <= int(aPulseWidth_field.get()) <= 100)
+		if update:
+			parameterlist.append(lowRateInterval_field.get())
+			parameterlist.append(uppRateInterval_field.get())
+			parameterlist.append(vPaceAmp_field.get())
+			parameterlist.append(vPulseWidth_field.get())
+			parameterlist.append(aPaceAmp_field.get())
+			parameterlist.append(aPulseWidth_field.get())
+			db_operations.update_attribute(user_id, parameterlist)
+			serial.serialTransmit(parameterlist)
+			no_update_label.place(relx=2, rely=0.65, anchor=CENTER) #show update failed
+			update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update was successful
+		else:
+			no_update_label['text'] = "Update Not Complete: Values were out of range!"
+			no_update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update failed	
+	elif confirmMode == False:
+		no_update_label['text'] = "Please confirm the mode before sending update!"
 		no_update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update failed
-
+		
 def logout():
     raise_frame(intro_frame)
     lowRateInterval_field.delete(0, END)
@@ -143,24 +151,31 @@ def register_to_intro():
 
 #change parameter input display when pace mode changes
 def update_params_page(direction):
+	hideAll()
 	update_label.place(relx=2, rely=0.6, anchor=CENTER) #remove update label from frame
 	no_update_label.place(relx=2, rely=0.6, anchor=CENTER) #remove no update label from frame
-	global pacingModeOptionCount, pacingModeOptionText, pacingModes, numofModes 
+	global pacingModeOptionCount, pacingModeOptionText, pacingModes, numofModes, confirmMode
 	if direction == 1: #cycle right
+		confirmMode = False
 		if pacingModeOptionCount == numofModes: #cycle through modes at the end
 			pacingModeOptionCount = 0
 		else:
 			pacingModeOptionCount += 1
 	elif direction == -1: #cycle left
+		confirmMode = False
 		if pacingModeOptionCount == 0: #cycle through modes at the end
 			pacingModeOptionCount = numofModes
 		else:
 			pacingModeOptionCount -= 1
+	elif direction == 0:
+		confirmMode = True
 	pacingModeOption['text'] = pacingModes[pacingModeOptionCount]
 	if (pacingModeOptionCount == 0 or pacingModeOptionCount == 3):
-		placeVentricle()
+		if (confirmMode == True):
+			placeVentricle()
 	elif (pacingModeOptionCount == 1 or pacingModeOptionCount == 2):
-		placeAtrial()
+		if (confirmMode == True):
+			placeAtrial()
 
 def placeVentricle():
 	vPaceAmp_label.place(relx=0.4, rely=0.35, anchor=CENTER)
@@ -171,6 +186,10 @@ def placeVentricle():
 	aPulseWidth_label.place(relx=2, rely=0.5, anchor=CENTER)
 	aPaceAmp_field.place(relx=2, rely=0.45, anchor=CENTER)
 	aPulseWidth_field.place(relx=2, rely=0.50, anchor=CENTER)
+	lowRateInterval_field.place(relx=0.6, rely=0.25, anchor=CENTER)
+	uppRateInterval_field.place(relx=0.6, rely=0.3, anchor=CENTER)
+	lowRateInterval_label.place(relx=0.4, rely=0.25, anchor=CENTER)
+	uppRateInterval_label.place(relx=0.4, rely=0.3, anchor=CENTER)
 	
 def placeAtrial():
 	vPaceAmp_label.place(relx=2, rely=0.35, anchor=CENTER)
@@ -181,7 +200,25 @@ def placeAtrial():
 	aPulseWidth_label.place(relx=0.4, rely=0.5, anchor=CENTER)
 	aPaceAmp_field.place(relx=0.6, rely=0.45, anchor=CENTER)
 	aPulseWidth_field.place(relx=0.6, rely=0.50, anchor=CENTER)
+	lowRateInterval_field.place(relx=0.6, rely=0.25, anchor=CENTER)
+	uppRateInterval_field.place(relx=0.6, rely=0.3, anchor=CENTER)
+	lowRateInterval_label.place(relx=0.4, rely=0.25, anchor=CENTER)
+	uppRateInterval_label.place(relx=0.4, rely=0.3, anchor=CENTER)
 	
+def hideAll():
+	vPaceAmp_label.place(relx=2, rely=0.35, anchor=CENTER)
+	vPulseWidth_label.place(relx=2, rely=0.4, anchor=CENTER)
+	vPaceAmp_field.place(relx=2, rely=2, anchor=CENTER)
+	vPulseWidth_field.place(relx=2, rely=2, anchor=CENTER)
+	aPaceAmp_label.place(relx=2, rely=0.45, anchor=CENTER)
+	aPulseWidth_label.place(relx=2, rely=0.5, anchor=CENTER)
+	aPaceAmp_field.place(relx=2, rely=0.45, anchor=CENTER)
+	aPulseWidth_field.place(relx=2, rely=0.50, anchor=CENTER)
+	lowRateInterval_field.place(relx=2, rely=0.25, anchor=CENTER)
+	uppRateInterval_field.place(relx=2, rely=0.3, anchor=CENTER)
+	lowRateInterval_label.place(relx=2, rely=0.25, anchor=CENTER)
+	uppRateInterval_label.place(relx=2, rely=0.3, anchor=CENTER)
+
 ############ Window Configuration ############
 window = Tk()
 window.geometry("1280x720")
@@ -278,15 +315,6 @@ params_panel.place(x=0, y=0, relwidth=1, relheight=1, height=0)
 #Title
 params_title_label = Label(params_frame, text="Programmable Parameters", fg = "white", bg="#31749b", font = "Georgia 16 bold", justify="center")
 params_title_label.place(relx=0.5, rely=0.1, anchor=CENTER)
-#Pacing mode option
-#default = StringVar(params_frame)
-#default.set("VOO") # default value
-#pacingModeOption = OptionMenu(params_frame, default, "VOO", "AOO", "AAI", "VVI")
-# pacingModes = ["VOO", "AOO", "AAI", "VVI"]
-# box_value = StringVar()
-# pacingModeOption=ttk.Combobox(params_frame, values=pacingModes, width=20, state="readonly", textvariable=box_value)
-# pacingModeOption.current(0)
-# pacingModeOption.place(relx=0.5, rely=0.2, anchor=CENTER)
 
 #Pacing Mode Initial Option
 pacingModeOptionCount = 0
@@ -339,12 +367,17 @@ modeLeft_button = Button(params_frame, text="<-", width=5, command= lambda: upda
 modeLeft_button.place(relx=0.4, rely=0.2, anchor=CENTER)
 logout_button = Button(params_frame, text="Logout", width=15, command=logout)
 logout_button.place(relx=0.6, rely=0.6, anchor=CENTER)
+confirm_button = Button(params_frame, text="CONFIRM", width=15, command= lambda: update_params_page(0))
+confirm_button.place(relx=0.7, rely=0.2, anchor=CENTER)
 #Indicator Labels
 communication_label = Label(params_frame, text="Communicating with pacemaker: No", font = "Helvetica 12", justify="left")
 communication_label.place(relx=0.5, rely=0.7, anchor=CENTER)
 unexpectedConn_label = Label(params_frame, text="--Unexpected Pacemaker Device Detected--", font = "Helvetica 12", justify="left")
 update_label = Label(params_frame, text="Update Complete", font = "Helvetica 12", justify="center")
 update_label.place(relx=2, rely=0.6, anchor=CENTER) #remove update label from frame
-no_update_label = Label(params_frame, text="Update Not Complete: Values were out of range!", font = "Helvetica 12", justify="center")
+
+noUpdateText = ""
+no_update_label= Label(params_frame , text = noUpdateText, font = "Helvetica 12", justify = "center")
 no_update_label.place(relx=2, rely=0.6, anchor=CENTER) #remove no update label from frame
+
 window.mainloop()
