@@ -8,11 +8,11 @@ from PIL import ImageTk, Image
 import sqlite3
 import db_operations
 import serialComm
-from serialComm import ser
+import time
 
 ############ Global non-widget variables ############
 user_id = -1
-pacingModes = ["VOO", "AOO", "AAI", "VVI"]
+pacingModes = ["VOO", "AOO", "AAI", "VVI", "DOO", "DOOR", "VOOR", "AOOR", "VVIR", "AAIR", "DDDR"]
 numofModes = len(pacingModes) - 1
 confirmMode = True
 ############ Functions ############
@@ -102,7 +102,7 @@ def register():
             register_existinguser_label.place(relx=0.5, rely=0.85, anchor=CENTER)
 
 def update_params():
-	global user_id, confirmMode
+	global user_id, confirmMode, communication_label
 	if confirmMode == True:
 		parameterlist = []
 		update=(30 <= int(lowRateInterval_field.get()) <= 90 and 90 <= int(uppRateInterval_field.get()) <= 180 and 0 <= int(vPaceAmp_field.get()) <= 100 and 1 <= int(vPulseWidth_field.get()) <= 100 and 0 <= int(aPaceAmp_field.get()) <= 100 and 1 <= int(aPulseWidth_field.get()) <= 100)
@@ -114,9 +114,10 @@ def update_params():
 			parameterlist.append(aPaceAmp_field.get())
 			parameterlist.append(aPulseWidth_field.get())
 			db_operations.update_attribute(user_id, parameterlist)
-			serialComm.serialTransmit(parameterlist)
+			serialComm.serialTransmit(parameterlist, pacingModeOptionCount)
 			no_update_label.place(relx=2, rely=0.65, anchor=CENTER) #show update failed
 			update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update was successful
+			communication_label.config(text='Communicating with pacemaker: No')
 		else:
 			no_update_label['text'] = "Update Not Complete: Values were out of range!"
 			no_update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update failed	
@@ -177,6 +178,10 @@ def update_params_page(direction):
 	elif (pacingModeOptionCount == 1 or pacingModeOptionCount == 2):
 		if (confirmMode == True):
 			placeAtrial()
+	elif (pacingModeOptionCount >= 4):
+		if (confirmMode == True):
+			placeVentricle()
+			placeAtrial()
 
 def placeVentricle():
 	vPaceAmp_label.place(relx=0.4, rely=0.35, anchor=CENTER)
@@ -219,6 +224,9 @@ def hideAll():
 	uppRateInterval_field.place(relx=2, rely=0.3, anchor=CENTER)
 	lowRateInterval_label.place(relx=2, rely=0.25, anchor=CENTER)
 	uppRateInterval_label.place(relx=2, rely=0.3, anchor=CENTER)
+
+def show_egram():
+	serialComm.serialReceive()
 
 ############ Window Configuration ############
 window = Tk()
@@ -370,6 +378,8 @@ logout_button = Button(params_frame, text="Logout", width=15, command=logout)
 logout_button.place(relx=0.6, rely=0.6, anchor=CENTER)
 confirm_button = Button(params_frame, text="CONFIRM", width=15, command= lambda: update_params_page(0))
 confirm_button.place(relx=0.7, rely=0.2, anchor=CENTER)
+egram_button = Button(params_frame, text="EGRAM", width=15, command=show_egram)
+egram_button.place(relx=0.9, rely=0.9, anchor=CENTER)
 #Indicator Labels
 communication_label = Label(params_frame, text="Communicating with pacemaker: No", font = "Helvetica 12", justify="left")
 communication_label.place(relx=0.5, rely=0.7, anchor=CENTER)
