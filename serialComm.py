@@ -14,7 +14,6 @@ def serialTransmit(parameters, mode):
 	for i in range(0, len(parameters)):
 		if i == 0 or i ==1:
 			parameters [i] = round(1/(int(parameters [i])) * 60 *1000)
-		#tx_list[3+i] = parameters [i]
 
 	print (tx_list)
 	#index 0: always 1
@@ -35,8 +34,8 @@ def serialTransmit(parameters, mode):
 	tx_list[7] = int(parameters[3]) - (tx_list[8] * 256)
 
 	vrp = 320
-	tx_list[10] = int(vrp / 256)
-	tx_list[9] = int(vrp) - (tx_list[10] * 256)
+	tx_list[10] = int(int(parameters[6]) / 256)
+	tx_list[9] = int(int(parameters[6])) - (tx_list[10] * 256)
 
 	apaceamp=40
 	tx_list[12] = int(int(parameters[4]) / 256)
@@ -47,8 +46,8 @@ def serialTransmit(parameters, mode):
 	tx_list[13] = int(parameters[5]) - (tx_list[14] * 256)
 
 	arp=250
-	tx_list[16] = int(arp / 256)
-	tx_list[15] = int(arp) - (tx_list[16] * 256)
+	tx_list[16] = int(int(parameters[7]) / 256)
+	tx_list[15] = int(int(parameters[7])) - (tx_list[16] * 256)
 
 	print(tx_list)
 
