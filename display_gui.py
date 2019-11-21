@@ -8,11 +8,11 @@ from PIL import ImageTk, Image
 import sqlite3
 import db_operations
 import serialComm
-from serialComm import ser
+import time
 
 ############ Global non-widget variables ############
 user_id = -1
-pacingModes = ["VOO", "AOO", "AAI", "VVI"]
+pacingModes = ["VOO", "AOO", "VVI", "AAI", "VOOR", "AOOR", "DOO", "DOOR", "VVIR", "AAIR", "DDDR"]
 numofModes = len(pacingModes) - 1
 confirmMode = True
 ############ Functions ############
@@ -31,32 +31,35 @@ def check_register_viability():
 
 #compare user credentials against database, log in user
 def login():
-    user = username_field.get()
-    password = password_field.get()
+	user = username_field.get()
+	password = password_field.get()
 
-    if not user and not password:
-        login_missingfield_label.place(relx=0.5, rely=0.9, anchor=CENTER)
-    else:
-        global user_id
-        user_id, params = db_operations.login_user(user, password)
+	if not user and not password:
+		login_missingfield_label.place(relx=0.5, rely=0.9, anchor=CENTER)
+	else:
+		global user_id
+		user_id, params = db_operations.login_user(user, password)
 
-        if params:
-            uppRateInterval_field
-            lowRateInterval_field.delete(0, END) 
-            lowRateInterval_field.insert(0, params[1])
-            uppRateInterval_field.delete(0, END)
-            uppRateInterval_field.insert(0, params[2])
-            vPaceAmp_field.delete(0, END)
-            vPaceAmp_field.insert(0, params[3])
-            vPulseWidth_field.delete(0, END)
-            vPulseWidth_field.insert(0, params[4])
-            aPaceAmp_field.delete(0, END)
-            aPaceAmp_field.insert(0, params[5])
-            aPulseWidth_field.delete(0, END)
-            aPulseWidth_field.insert(0, params[6])
-            raise_frame(params_frame)
-        else:
-            unidentified_user_label.place(relx=0.5, rely=0.8, anchor=CENTER)
+		if params:
+			lowRateInterval_field.delete(0, END) 
+			lowRateInterval_field.insert(0, params[1])
+			uppRateInterval_field.delete(0, END)
+			uppRateInterval_field.insert(0, params[2])
+			vPaceAmp_field.delete(0, END)
+			vPaceAmp_field.insert(0, params[3])
+			vPulseWidth_field.delete(0, END)
+			vPulseWidth_field.insert(0, params[4])
+			aPaceAmp_field.delete(0, END)
+			aPaceAmp_field.insert(0, params[5])
+			aPulseWidth_field.delete(0, END)
+			aPulseWidth_field.insert(0, params[6])
+			vrp_field.delete(0, END)
+			vrp_field.insert(0, params[7])
+			arp_field.delete(0, END)
+			arp_field.insert(0, params[8])
+			raise_frame(params_frame)
+		else:
+			unidentified_user_label.place(relx=0.5, rely=0.8, anchor=CENTER)
 
 def remove_error_messages():
 	unidentified_user_label.place(relx=2, rely=2)
@@ -71,38 +74,42 @@ def to_login():
     raise_frame(login_frame)
 
 def register():
-    user = register_username_field.get()
-    password = register_password_field.get()
+	user = register_username_field.get()
+	password = register_password_field.get()
 
-    if not user or not password:
-        register_missingfield_label.place(relx=0.5, rely=0.8, anchor=CENTER)
-    else:
-        global user_id
-        is_new_user = False
-        is_new_user = db_operations.check_if_exists(user)
-        if is_new_user:
-            user_id = db_operations.register_user(user, password)
-            db_operations.add_attribute(user_id, 60, 180, 50, 10, 50, 10)
-            raise_frame(params_frame)
-            parameter_list = db_operations.get_attributes(user_id)
-            print(parameter_list)
-            lowRateInterval_field.delete(0, END) #deletes the current value
-            lowRateInterval_field.insert(0, parameter_list[1])
-            uppRateInterval_field.delete(0, END)
-            uppRateInterval_field.insert(0, parameter_list[2])
-            vPaceAmp_field.delete(0, END)
-            vPaceAmp_field.insert(0, parameter_list[3])
-            vPulseWidth_field.delete(0, END)
-            vPulseWidth_field.insert(0, parameter_list[4])
-            aPaceAmp_field.delete(0, END)
-            aPaceAmp_field.insert(0, parameter_list[5])
-            aPulseWidth_field.delete(0, END)
-            aPulseWidth_field.insert(0, parameter_list[6])
-        else:
-            register_existinguser_label.place(relx=0.5, rely=0.85, anchor=CENTER)
+	if not user or not password:
+		register_missingfield_label.place(relx=0.5, rely=0.8, anchor=CENTER)
+	else:
+		global user_id
+		is_new_user = False
+		is_new_user = db_operations.check_if_exists(user)
+		if is_new_user:
+			user_id = db_operations.register_user(user, password)
+			db_operations.add_attribute(user_id, 60, 180, 50, 10, 50, 10, 320, 250)
+			raise_frame(params_frame)
+			parameter_list = db_operations.get_attributes(user_id)
+			print(parameter_list)
+			lowRateInterval_field.delete(0, END) #deletes the current value
+			lowRateInterval_field.insert(0, parameter_list[1])
+			uppRateInterval_field.delete(0, END)
+			uppRateInterval_field.insert(0, parameter_list[2])
+			vPaceAmp_field.delete(0, END)
+			vPaceAmp_field.insert(0, parameter_list[3])
+			vPulseWidth_field.delete(0, END)
+			vPulseWidth_field.insert(0, parameter_list[4])
+			aPaceAmp_field.delete(0, END)
+			aPaceAmp_field.insert(0, parameter_list[5])
+			aPulseWidth_field.delete(0, END)
+			aPulseWidth_field.insert(0, parameter_list[6])
+			vrp_field.delete(0, END)
+			vrp_field.insert(0, parameter_list[6])
+			arp_field.delete(0, END)
+			arp_field.insert(0, parameter_list[6])
+		else:
+			register_existinguser_label.place(relx=0.5, rely=0.85, anchor=CENTER)
 
 def update_params():
-	global user_id, confirmMode
+	global user_id, confirmMode, communication_label
 	if confirmMode == True:
 		parameterlist = []
 		update=(30 <= int(lowRateInterval_field.get()) <= 90 and 90 <= int(uppRateInterval_field.get()) <= 180 and 0 <= int(vPaceAmp_field.get()) <= 100 and 1 <= int(vPulseWidth_field.get()) <= 100 and 0 <= int(aPaceAmp_field.get()) <= 100 and 1 <= int(aPulseWidth_field.get()) <= 100)
@@ -113,10 +120,13 @@ def update_params():
 			parameterlist.append(vPulseWidth_field.get())
 			parameterlist.append(aPaceAmp_field.get())
 			parameterlist.append(aPulseWidth_field.get())
+			parameterlist.append(vrp_field.get())
+			parameterlist.append(arp_field.get())
 			db_operations.update_attribute(user_id, parameterlist)
-			serialComm.serialTransmit(parameterlist)
+			serialComm.serialTransmit(parameterlist, pacingModeOptionCount)
 			no_update_label.place(relx=2, rely=0.65, anchor=CENTER) #show update failed
 			update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update was successful
+			communication_label.config(text='Communicating with pacemaker: No')
 		else:
 			no_update_label['text'] = "Update Not Complete: Values were out of range!"
 			no_update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update failed	
@@ -125,18 +135,20 @@ def update_params():
 		no_update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update failed
 		
 def logout():
-    raise_frame(intro_frame)
-    lowRateInterval_field.delete(0, END)
-    uppRateInterval_field.delete(0, END)
-    vPaceAmp_field.delete(0, END)
-    vPulseWidth_field.delete(0, END)
-    aPaceAmp_field.delete(0, END)
-    aPulseWidth_field.delete(0, END)
-    register_username_field.delete(0, END)
-    register_password_field.delete(0, END)
-    username_field.delete(0, END)
-    password_field.delete(0, END)
-    remove_error_messages()
+	raise_frame(intro_frame)
+	lowRateInterval_field.delete(0, END)
+	uppRateInterval_field.delete(0, END)
+	vPaceAmp_field.delete(0, END)
+	vPulseWidth_field.delete(0, END)
+	aPaceAmp_field.delete(0, END)
+	aPulseWidth_field.delete(0, END)
+	vrp_field.delete(0, END)
+	arp_field.delete(0, END)
+	register_username_field.delete(0, END)
+	register_password_field.delete(0, END)
+	username_field.delete(0, END)
+	password_field.delete(0, END)
+	remove_error_messages()
 
 def login_to_intro():
     raise_frame(intro_frame)
@@ -171,12 +183,47 @@ def update_params_page(direction):
 	elif direction == 0:
 		confirmMode = True
 	pacingModeOption['text'] = pacingModes[pacingModeOptionCount]
-	if (pacingModeOptionCount == 0 or pacingModeOptionCount == 3):
-		if (confirmMode == True):
+
+	if confirmMode == True:
+		if pacingModeOptionCount == 0: #VOO
+			hideAll()
 			placeVentricle()
-	elif (pacingModeOptionCount == 1 or pacingModeOptionCount == 2):
-		if (confirmMode == True):
+		elif pacingModeOptionCount == 1: #AOO
+			hideAll()
 			placeAtrial()
+		elif pacingModeOptionCount == 2: #VVI
+			hideAll()
+			placeVentricle()
+			placeVRP()
+		elif pacingModeOptionCount == 3: #AAI
+			hideAll()
+			placeAtrial()
+			placeARP()
+		elif pacingModeOptionCount == 4: #VOOR
+			hideAll()
+			placeVentricle()
+		elif pacingModeOptionCount == 5: #AOOR
+			hideAll()
+			placeAtrial()
+		elif pacingModeOptionCount == 6: #DOO
+			hideAll()
+			placeDOOs(0)
+		elif pacingModeOptionCount == 7: #DOOR
+			hideAll()
+			placeDOOs(1)
+		elif pacingModeOptionCount == 8: #VVIR
+			hideAll()
+			placeDOOs(1)
+			placeVRP()
+		elif pacingModeOptionCount == 9: #AAIR
+			hideAll()
+			placeDOOs(1)
+			placeARP()
+		elif pacingModeOptionCount == 10: #DDDR
+			hideAll()
+			placeDOOs(1)
+			placeARP()
+			placeVRP()
 
 def placeVentricle():
 	vPaceAmp_label.place(relx=0.4, rely=0.35, anchor=CENTER)
@@ -205,6 +252,29 @@ def placeAtrial():
 	uppRateInterval_field.place(relx=0.6, rely=0.3, anchor=CENTER)
 	lowRateInterval_label.place(relx=0.4, rely=0.25, anchor=CENTER)
 	uppRateInterval_label.place(relx=0.4, rely=0.3, anchor=CENTER)
+
+def placeDOOs(selection):
+	lowRateInterval_label.place(relx=0.4, rely=0.25, anchor=CENTER)
+	lowRateInterval_field.place(relx=0.6, rely=0.25, anchor=CENTER)
+	vPaceAmp_label.place(relx=0.4, rely=0.35, anchor=CENTER)
+	vPulseWidth_label.place(relx=0.4, rely=0.4, anchor=CENTER)
+	vPaceAmp_field.place(relx=0.6, rely=0.35, anchor=CENTER)
+	vPulseWidth_field.place(relx=0.6, rely=0.40, anchor=CENTER)
+	aPaceAmp_label.place(relx=0.4, rely=0.45, anchor=CENTER)
+	aPulseWidth_label.place(relx=0.4, rely=0.5, anchor=CENTER)
+	aPaceAmp_field.place(relx=0.6, rely=0.45, anchor=CENTER)
+	aPulseWidth_field.place(relx=0.6, rely=0.50, anchor=CENTER)
+	if selection == 1:
+		uppRateInterval_field.place(relx=0.6, rely=0.3, anchor=CENTER)
+		uppRateInterval_label.place(relx=0.4, rely=0.3, anchor=CENTER)
+
+def placeVRP():
+	vrp_label.place(relx=0.4, rely=0.55, anchor=CENTER)
+	vrp_field.place(relx=0.6, rely=0.55, anchor=CENTER)
+
+def placeARP():
+	arp_label.place(relx=0.4, rely=0.6, anchor=CENTER)
+	arp_field.place(relx=0.6, rely=0.6, anchor=CENTER)
 	
 def hideAll():
 	vPaceAmp_label.place(relx=2, rely=0.35, anchor=CENTER)
@@ -219,6 +289,13 @@ def hideAll():
 	uppRateInterval_field.place(relx=2, rely=0.3, anchor=CENTER)
 	lowRateInterval_label.place(relx=2, rely=0.25, anchor=CENTER)
 	uppRateInterval_label.place(relx=2, rely=0.3, anchor=CENTER)
+	vrp_field.place(relx=2, rely=0.3, anchor=CENTER)
+	vrp_label.place(relx=2, rely=0.3, anchor=CENTER)
+	arp_field.place(relx=2, rely=0.3, anchor=CENTER)
+	arp_label.place(relx=2, rely=0.3, anchor=CENTER)
+
+def show_egram():
+	serialComm.serialReceive()
 
 ############ Window Configuration ############
 window = Tk()
@@ -359,17 +436,31 @@ aPulseWidth_label.place(relx=2, rely=0.5, anchor=CENTER)
 aPulseWidth = StringVar()
 aPulseWidth_field = Entry(params_frame, textvariable=aPulseWidth)
 aPulseWidth_field.place(relx=2, rely=0.5, anchor=CENTER)
+#Ventrical refractory period
+vrp_label = Label(params_frame, text="Ventricle Refractory Period:", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
+vrp_label.place(relx=2, rely=0.55, anchor=CENTER)
+vrp = StringVar()
+vrp_field = Entry(params_frame, textvariable=vrp)
+vrp_field.place(relx=2, rely=0.55, anchor=CENTER)
+#Atrial refractory period
+arp_label = Label(params_frame, text="Atrial Refractory Period:", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
+arp_label.place(relx=2, rely=0.6, anchor=CENTER)
+arp = StringVar()
+arp_field = Entry(params_frame, textvariable=arp)
+arp_field.place(relx=2, rely=0.6, anchor=CENTER)
 #Buttons
 update_button = Button(params_frame, text="Update", width=15, command=update_params)
-update_button.place(relx=0.4, rely=0.6, anchor=CENTER)
+update_button.place(relx=0.4, rely=0.8, anchor=CENTER)
 modeRight_button = Button(params_frame, text="->", width=5, command= lambda: update_params_page(1))
 modeRight_button.place(relx=0.6, rely=0.2, anchor=CENTER)
 modeLeft_button = Button(params_frame, text="<-", width=5, command= lambda: update_params_page(-1))
 modeLeft_button.place(relx=0.4, rely=0.2, anchor=CENTER)
 logout_button = Button(params_frame, text="Logout", width=15, command=logout)
-logout_button.place(relx=0.6, rely=0.6, anchor=CENTER)
+logout_button.place(relx=0.6, rely=0.8, anchor=CENTER)
 confirm_button = Button(params_frame, text="CONFIRM", width=15, command= lambda: update_params_page(0))
 confirm_button.place(relx=0.7, rely=0.2, anchor=CENTER)
+egram_button = Button(params_frame, text="EGRAM", width=15, command=show_egram)
+egram_button.place(relx=0.9, rely=0.9, anchor=CENTER)
 #Indicator Labels
 communication_label = Label(params_frame, text="Communicating with pacemaker: No", font = "Helvetica 12", justify="left")
 communication_label.place(relx=0.5, rely=0.7, anchor=CENTER)
