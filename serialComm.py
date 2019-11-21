@@ -9,12 +9,7 @@ import matplotlib.pyplot as plt
 def serialTransmit(parameters, mode):
 	tx_list = [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22]
 
-	if mode == 2:
-		tx_list[2] = 4
-	elif mode == 3:
-		tx_list[2] = 3
-	else:
-		tx_list[2] = mode + 1
+	tx_list[2] = mode + 1
 
 	for i in range(0, len(parameters)):
 		if i == 0 or i ==1:

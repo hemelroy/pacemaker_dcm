@@ -5,7 +5,7 @@ def connect():
 	conn=sqlite3.connect("records.db")
 	cur=conn.cursor()
 	cur.execute("CREATE TABLE IF NOT EXISTS Users (user_id INTEGER PRIMARY KEY, username text, password text)")
-	cur.execute("CREATE TABLE IF NOT EXISTS Attributes (user_id integer NOT NULL, lrLimit, urLimit, vAmplitude, vPWidth,aAmplitude, aPWidth, FOREIGN KEY(user_id) REFERENCES Users (user_id))")
+	cur.execute("CREATE TABLE IF NOT EXISTS Attributes (user_id integer NOT NULL, lrLimit, urLimit, vAmplitude, vPWidth,aAmplitude, aPWidth, vrp, arp, FOREIGN KEY(user_id) REFERENCES Users (user_id))")
 	conn.commit()
 	conn.close()
 
@@ -45,10 +45,10 @@ def register_user(r_username, r_password):
 	return id
 
 #Insert user's programmable parameters	
-def add_attribute(id,lrLimit, urLimit, vAmplitude, vPWidth,aAmplitude, aPWidth):
+def add_attribute(id,lrLimit, urLimit, vAmplitude, vPWidth,aAmplitude, aPWidth, vrp, arp):
 	conn=sqlite3.connect("records.db")
 	cur=conn.cursor()
-	cur.execute("INSERT INTO Attributes VALUES (?,?,?,?,?,?,?)",(id,lrLimit, urLimit, vAmplitude, vPWidth,aAmplitude, aPWidth))
+	cur.execute("INSERT INTO Attributes VALUES (?,?,?,?,?,?,?,?,?)",(id, lrLimit, urLimit, vAmplitude, vPWidth,aAmplitude, aPWidth, vrp, arp))
 	conn.commit()
 	conn.close()
 
@@ -56,7 +56,7 @@ def add_attribute(id,lrLimit, urLimit, vAmplitude, vPWidth,aAmplitude, aPWidth):
 def update_attribute(id, parameters):
 	conn=sqlite3.connect('records.db')
 	cur=conn.cursor()
-	cur.execute("Update Attributes set lrLimit=?, urLimit=?,vAmplitude=?,vPWidth=?, aAmplitude=?,aPWidth=? where user_id = ?",(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4],parameters[5],id))
+	cur.execute("Update Attributes set lrLimit=?, urLimit=?,vAmplitude=?,vPWidth=?, aAmplitude=?, aPWidth=?, vrp=?, arp=? where user_id = ?",(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4],parameters[5], parameters[6], parameters[7], id))
 	conn.commit()
 	conn.close()
 
