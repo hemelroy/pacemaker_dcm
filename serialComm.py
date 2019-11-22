@@ -11,11 +11,15 @@ def serialTransmit(parameters, mode):
 
 	tx_list[2] = mode + 1
 
+	print (parameters[2],type(parameters[2]))
 	for i in range(0, len(parameters)):
-		if i == 0 or i ==1:
+		if i == 0 or i == 1:
 			parameters [i] = round(1/(int(parameters [i])) * 60 *1000)
+		if i == 2 or i == 4:
+			parameters [i] = (round(float(parameters [i]),2) / 5.0) * 100
 
 	print (tx_list)
+	print (parameters)
 	#index 0: always 1
 	#index 1: 1 for transmit, 0 for receive
 	#index 2 through 20: programmable parameters
