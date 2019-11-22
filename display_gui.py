@@ -85,7 +85,7 @@ def register():
 		is_new_user = db_operations.check_if_exists(user)
 		if is_new_user:
 			user_id = db_operations.register_user(user, password)
-			db_operations.add_attribute(user_id, 60, 180, 50, 10, 50, 10, 320, 250)
+			db_operations.add_attribute(user_id, 60, 180, 2.5, 10, 2.5, 10, 320, 250)
 			raise_frame(params_frame)
 			parameter_list = db_operations.get_attributes(user_id)
 			print(parameter_list)
@@ -112,24 +112,31 @@ def update_params():
 	global user_id, confirmMode, communication_label
 	if confirmMode == True:
 		parameterlist = []
-		update=(30 <= int(lowRateInterval_field.get()) <= 90 and 90 <= int(uppRateInterval_field.get()) <= 180 and 0 <= int(vPaceAmp_field.get()) <= 100 and 1 <= int(vPulseWidth_field.get()) <= 100 and 0 <= int(aPaceAmp_field.get()) <= 100 and 1 <= int(aPulseWidth_field.get()) <= 100)
-		if update:
-			parameterlist.append(lowRateInterval_field.get())
-			parameterlist.append(uppRateInterval_field.get())
-			parameterlist.append(vPaceAmp_field.get())
-			parameterlist.append(vPulseWidth_field.get())
-			parameterlist.append(aPaceAmp_field.get())
-			parameterlist.append(aPulseWidth_field.get())
-			parameterlist.append(vrp_field.get())
-			parameterlist.append(arp_field.get())
-			db_operations.update_attribute(user_id, parameterlist)
-			serialComm.serialTransmit(parameterlist, pacingModeOptionCount)
-			no_update_label.place(relx=2, rely=0.65, anchor=CENTER) #show update failed
-			update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update was successful
-			communication_label.config(text='Communicating with pacemaker: No')
-		else:
-			no_update_label['text'] = "Update Not Complete: Values were out of range!"
-			no_update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update failed	
+		try:
+			update=(30 <= int(lowRateInterval_field.get()) <= 90 and 90 <= int(uppRateInterval_field.get()) <= 180 and
+			0.00 <= float(vPaceAmp_field.get()) <= 5.00 and 1 <= int(vPulseWidth_field.get()) <= 100 and
+			0.00 <= float(aPaceAmp_field.get()) <= 5.00 and 1 <= int(aPulseWidth_field.get()) <= 100 and
+			150 <= int(vrp_field.get()) <= 500 and 150 <= int(arp_field.get()) <= 500)
+			if update:
+				parameterlist.append(lowRateInterval_field.get())
+				parameterlist.append(uppRateInterval_field.get())
+				parameterlist.append(vPaceAmp_field.get())
+				parameterlist.append(vPulseWidth_field.get())
+				parameterlist.append(aPaceAmp_field.get())
+				parameterlist.append(aPulseWidth_field.get())
+				parameterlist.append(vrp_field.get())
+				parameterlist.append(arp_field.get())
+				db_operations.update_attribute(user_id, parameterlist)
+				#serialComm.serialTransmit(parameterlist, pacingModeOptionCount)
+				no_update_label.place(relx=2, rely=0.65, anchor=CENTER) #show update failed
+				update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update was successful
+				communication_label.config(text='Communicating with pacemaker: No')
+			else:
+				no_update_label['text'] = "Update Not Complete: Value(s) were out of range!"
+				no_update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update failed	
+		except:
+			no_update_label['text'] = "Update Not Complete: Value(s) were not inputted in the correct format"
+			no_update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update failed if float inputted when expecting int
 	elif confirmMode == False:
 		no_update_label['text'] = "Please confirm the mode before sending update!"
 		no_update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update failed
@@ -401,49 +408,49 @@ pacingModeOption = Label(params_frame , text = pacingModeOptionText, fg = "white
 pacingModeOption.place(relx=0.5, rely=0.2, anchor=CENTER)
 
 #Lower Rate Interval
-lowRateInterval_label = Label(params_frame, text="Lower Rate Limit:", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
+lowRateInterval_label = Label(params_frame, text="Lower Rate Limit [30 - 90 bpm]:", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
 lowRateInterval_label.place(relx=0.4, rely=0.25, anchor=CENTER)
 lowRateInterval = StringVar()
 lowRateInterval_field = Entry(params_frame, textvariable=lowRateInterval)
 lowRateInterval_field.place(relx=0.6, rely=0.25, anchor=CENTER)
 #Upper Rate Interval
-uppRateInterval_label = Label(params_frame, text="Upper Rate Limit:", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
+uppRateInterval_label = Label(params_frame, text="Upper Rate Limit [90 - 180 bpm]:", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
 uppRateInterval_label.place(relx=0.4, rely=0.3, anchor=CENTER)
 uppRateInterval = StringVar()
 uppRateInterval_field = Entry(params_frame, textvariable=uppRateInterval)
 uppRateInterval_field.place(relx=0.6, rely=0.3, anchor=CENTER)
 #Ventricle Pace Amplitude
-vPaceAmp_label = Label(params_frame, text="Ventricular Amplitude:", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
+vPaceAmp_label = Label(params_frame, text="Ventricular Amplitude [0 - 5.0 V]:", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
 vPaceAmp_label.place(relx=0.4, rely=0.35, anchor=CENTER)
 vPaceAmp = StringVar()
 vPaceAmp_field = Entry(params_frame, textvariable=vPaceAmp)
 vPaceAmp_field.place(relx=0.6, rely=0.35, anchor=CENTER)
 #Ventricle pulse width
-vPulseWidth_label = Label(params_frame, text="Ventricular Pulse Width:", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
+vPulseWidth_label = Label(params_frame, text="Ventricular Pulse Width [1 - 100 ms]:", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
 vPulseWidth_label.place(relx=0.4, rely=0.4, anchor=CENTER)
 vPulseWidth = StringVar()
 vPulseWidth_field = Entry(params_frame, textvariable=vPulseWidth)
 vPulseWidth_field.place(relx=0.6, rely=0.4, anchor=CENTER)
 #Atrial pace amplitude
-aPaceAmp_label = Label(params_frame, text="Atrial Amplitude:", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
+aPaceAmp_label = Label(params_frame, text="Atrial Amplitude [0 - 5.0 V]: ", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
 aPaceAmp_label.place(relx=2, rely=0.45, anchor=CENTER)
 aPaceAmp = StringVar()
 aPaceAmp_field = Entry(params_frame, textvariable=aPaceAmp)
 aPaceAmp_field.place(relx=2, rely=0.45, anchor=CENTER)
 #Atrial pulse width
-aPulseWidth_label = Label(params_frame, text="Atrial Pulse Width:", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
+aPulseWidth_label = Label(params_frame, text="Atrial Pulse Width [1 - 100 ms]: ", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
 aPulseWidth_label.place(relx=2, rely=0.5, anchor=CENTER)
 aPulseWidth = StringVar()
 aPulseWidth_field = Entry(params_frame, textvariable=aPulseWidth)
 aPulseWidth_field.place(relx=2, rely=0.5, anchor=CENTER)
 #Ventrical refractory period
-vrp_label = Label(params_frame, text="Ventricle Refractory Period:", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
+vrp_label = Label(params_frame, text="Ventricle Refractory Period [150 - 500 ms]:", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
 vrp_label.place(relx=2, rely=0.55, anchor=CENTER)
 vrp = StringVar()
 vrp_field = Entry(params_frame, textvariable=vrp)
 vrp_field.place(relx=2, rely=0.55, anchor=CENTER)
 #Atrial refractory period
-arp_label = Label(params_frame, text="Atrial Refractory Period:", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
+arp_label = Label(params_frame, text="Atrial Refractory Period [150 - 500 ms] :", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
 arp_label.place(relx=2, rely=0.6, anchor=CENTER)
 arp = StringVar()
 arp_field = Entry(params_frame, textvariable=arp)
