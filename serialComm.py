@@ -13,8 +13,8 @@ def serialTransmit(parameters, mode):
 
 	print (parameters[2],type(parameters[2]))
 	for i in range(0, len(parameters)):
-		if i == 0 or i == 1:
-			parameters [i] = round(1/(int(parameters [i])) * 60 *1000)
+		#if i == 0 or i == 1:
+		#	parameters [i] = round(1/(int(parameters [i])) * 60 *1000)
 		if i == 2 or i == 4:
 			parameters [i] = (round(float(parameters [i]),2) / 5.0) * 100
 
@@ -107,3 +107,7 @@ def serialReceive():
 	plt.plot(aEgram)
 	plt.show()
 	time.sleep(2)
+
+def serialTest():
+	ser = Serial('COM5', baudrate=115200, timeout=1)
+

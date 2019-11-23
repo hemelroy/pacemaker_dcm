@@ -109,6 +109,7 @@ def register():
 			register_existinguser_label.place(relx=0.5, rely=0.85, anchor=CENTER)
 
 def update_params():
+	serialCommTest()
 	global user_id, confirmMode, communication_label
 	if confirmMode == True:
 		parameterlist = []
@@ -126,11 +127,14 @@ def update_params():
 				parameterlist.append(aPulseWidth_field.get())
 				parameterlist.append(vrp_field.get())
 				parameterlist.append(arp_field.get())
-				db_operations.update_attribute(user_id, parameterlist)
-				#serialComm.serialTransmit(parameterlist, pacingModeOptionCount)
-				no_update_label.place(relx=2, rely=0.65, anchor=CENTER) #show update failed
-				update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update was successful
-				communication_label.config(text='Communicating with pacemaker: No')
+				try:
+					serialComm.serialTransmit(parameterlist, pacingModeOptionCount)
+					db_operations.update_attribute(user_id, parameterlist)
+					communication_label.config(text='Communicating with pacemaker: Yes')
+				except:
+					no_update_label['text'] = "Update Not Complete: Seems like there is no communication with the pacemaker"
+					no_update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update failed
+					communication_label.config(text='Communicating with pacemaker: No')	
 			else:
 				no_update_label['text'] = "Update Not Complete: Value(s) were out of range!"
 				no_update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update failed	
@@ -171,6 +175,7 @@ def register_to_intro():
 
 #change parameter input display when pace mode changes
 def update_params_page(direction):
+	serialCommTest()
 	hideAll()
 	update_label.place(relx=2, rely=0.6, anchor=CENTER) #remove update label from frame
 	no_update_label.place(relx=2, rely=0.6, anchor=CENTER) #remove no update label from frame
@@ -233,6 +238,7 @@ def update_params_page(direction):
 			placeVRP()
 
 def placeVentricle():
+	serialCommTest()
 	vPaceAmp_label.place(relx=0.4, rely=0.35, anchor=CENTER)
 	vPulseWidth_label.place(relx=0.4, rely=0.4, anchor=CENTER)
 	vPaceAmp_field.place(relx=0.6, rely=0.35, anchor=CENTER)
@@ -247,6 +253,7 @@ def placeVentricle():
 	uppRateInterval_label.place(relx=0.4, rely=0.3, anchor=CENTER)
 	
 def placeAtrial():
+	serialCommTest()
 	vPaceAmp_label.place(relx=2, rely=0.35, anchor=CENTER)
 	vPulseWidth_label.place(relx=2, rely=0.4, anchor=CENTER)
 	vPaceAmp_field.place(relx=2, rely=2, anchor=CENTER)
@@ -261,6 +268,7 @@ def placeAtrial():
 	uppRateInterval_label.place(relx=0.4, rely=0.3, anchor=CENTER)
 
 def placeDOOs(selection):
+	serialCommTest()
 	lowRateInterval_label.place(relx=0.4, rely=0.25, anchor=CENTER)
 	lowRateInterval_field.place(relx=0.6, rely=0.25, anchor=CENTER)
 	vPaceAmp_label.place(relx=0.4, rely=0.35, anchor=CENTER)
@@ -276,14 +284,17 @@ def placeDOOs(selection):
 		uppRateInterval_label.place(relx=0.4, rely=0.3, anchor=CENTER)
 
 def placeVRP():
+	serialCommTest()
 	vrp_label.place(relx=0.4, rely=0.55, anchor=CENTER)
 	vrp_field.place(relx=0.6, rely=0.55, anchor=CENTER)
 
 def placeARP():
+	serialCommTest()
 	arp_label.place(relx=0.4, rely=0.6, anchor=CENTER)
 	arp_field.place(relx=0.6, rely=0.6, anchor=CENTER)
 	
 def hideAll():
+	serialCommTest()
 	vPaceAmp_label.place(relx=2, rely=0.35, anchor=CENTER)
 	vPulseWidth_label.place(relx=2, rely=0.4, anchor=CENTER)
 	vPaceAmp_field.place(relx=2, rely=2, anchor=CENTER)
@@ -302,7 +313,15 @@ def hideAll():
 	arp_label.place(relx=2, rely=0.3, anchor=CENTER)
 
 def show_egram():
+	serialCommTest()
 	serialComm.serialReceive()
+
+def serialCommTest():
+	try:
+		serialComm.serialTest()
+		communication_label.config(text = 'Communicating with pacemaker: YES')
+	except:
+		communication_label.config(text = 'Communicating with pacemaker: NO')
 
 ############ Window Configuration ############
 window = Tk()
@@ -432,7 +451,7 @@ vPulseWidth = StringVar()
 vPulseWidth_field = Entry(params_frame, textvariable=vPulseWidth)
 vPulseWidth_field.place(relx=0.6, rely=0.4, anchor=CENTER)
 #Atrial pace amplitude
-aPaceAmp_label = Label(params_frame, text="Atrial Amplitude [0 - 5.0 V]: ", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
+aPaceAmp_label = Label(params_frame, text="Atrial Amplitude [0 - 5 V]: ", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
 aPaceAmp_label.place(relx=2, rely=0.45, anchor=CENTER)
 aPaceAmp = StringVar()
 aPaceAmp_field = Entry(params_frame, textvariable=aPaceAmp)
