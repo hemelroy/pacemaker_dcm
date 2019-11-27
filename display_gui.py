@@ -12,9 +12,7 @@ import time
 
 ############ Global non-widget variables ############
 user_id = -1
-pacingModes = ["VOO", "AOO", "VVI", "AAI", "VOOR", "AOOR", "DOO", "DOOR", "VVIR", "AAIR", "DDDR"]
-numofModes = len(pacingModes) - 1
-confirmMode = True
+
 ############ Functions ############
 #switch screens
 def raise_frame(frame):
@@ -88,7 +86,7 @@ def register():
 			db_operations.add_attribute(user_id, 60, 180, 2.5, 10, 2.5, 10, 320, 250)
 			raise_frame(params_frame)
 			parameter_list = db_operations.get_attributes(user_id)
-			print(parameter_list)
+			print('Database:', parameter_list)
 			lowRateInterval_field.delete(0, END) #deletes the current value
 			lowRateInterval_field.insert(0, parameter_list[1])
 			uppRateInterval_field.delete(0, END)
@@ -102,9 +100,9 @@ def register():
 			aPulseWidth_field.delete(0, END)
 			aPulseWidth_field.insert(0, parameter_list[6])
 			vrp_field.delete(0, END)
-			vrp_field.insert(0, parameter_list[6])
+			vrp_field.insert(0, parameter_list[7])
 			arp_field.delete(0, END)
-			arp_field.insert(0, parameter_list[6])
+			arp_field.insert(0, parameter_list[8])
 		else:
 			register_existinguser_label.place(relx=0.5, rely=0.85, anchor=CENTER)
 
@@ -128,8 +126,11 @@ def update_params():
 				parameterlist.append(vrp_field.get())
 				parameterlist.append(arp_field.get())
 				try:
+					databaseList = parameterlist.copy()
 					serialComm.serialTransmit(parameterlist, pacingModeOptionCount)
-					db_operations.update_attribute(user_id, parameterlist)
+					print ('After Serial Before Database', databaseList)
+					db_operations.update_attribute(user_id, databaseList)
+					update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update complete label from frame
 					communication_label.config(text='Communicating with pacemaker: Yes')
 				except:
 					no_update_label['text'] = "Update Not Complete: Seems like there is no communication with the pacemaker"
@@ -420,7 +421,10 @@ params_panel.place(x=0, y=0, relwidth=1, relheight=1, height=0)
 params_title_label = Label(params_frame, text="Programmable Parameters", fg = "white", bg="#31749b", font = "Georgia 16 bold", justify="center")
 params_title_label.place(relx=0.5, rely=0.1, anchor=CENTER)
 
-#Pacing Mode Initial Option
+#Pacing Mode
+pacingModes = ["VOO", "AOO", "VVI", "AAI", "VOOR", "AOOR", "DOO", "DOOR", "VVIR", "AAIR", "DDDR"]
+numofModes = len(pacingModes) - 1
+confirmMode = True
 pacingModeOptionCount = 0
 pacingModeOptionText = "VOO"
 pacingModeOption = Label(params_frame , text = pacingModeOptionText, fg = "white", bg="#31749b", font = "Helvetica 12")
