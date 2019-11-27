@@ -53,6 +53,10 @@ def serialTransmit(parameters, mode):
 	tx_list[16] = int(int(parameters[7]) / 256)
 	tx_list[15] = int(int(parameters[7])) - (tx_list[16] * 256)
 
+	avDelay=100
+	tx_list[18] = int(int(parameters[8]) / 256)
+	tx_list[17] = int(int(parameters[8])) - (tx_list[18] * 256)
+	
 	print('Send:',tx_list)
 
 	ser = Serial('COM7', baudrate=115200, timeout=1)

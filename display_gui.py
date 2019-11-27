@@ -55,6 +55,8 @@ def login():
 			vrp_field.insert(0, params[7])
 			arp_field.delete(0, END)
 			arp_field.insert(0, params[8])
+			avDelay_field.delete(0, END)
+			avDelay_field.insert(0, params[9])
 			raise_frame(params_frame)
 		else:
 			unidentified_user_label.place(relx=0.5, rely=0.8, anchor=CENTER)
@@ -83,7 +85,7 @@ def register():
 		is_new_user = db_operations.check_if_exists(user)
 		if is_new_user:
 			user_id = db_operations.register_user(user, password)
-			db_operations.add_attribute(user_id, 60, 180, 2.5, 10, 2.5, 10, 320, 250)
+			db_operations.add_attribute(user_id, 60, 180, 2.5, 10, 2.5, 10, 320, 250, 150)
 			raise_frame(params_frame)
 			parameter_list = db_operations.get_attributes(user_id)
 			print('Database:', parameter_list)
@@ -103,6 +105,9 @@ def register():
 			vrp_field.insert(0, parameter_list[7])
 			arp_field.delete(0, END)
 			arp_field.insert(0, parameter_list[8])
+			avDelay_field.delete(0, END)
+			avDelay_field.insert(0, parameter_list[9])
+
 		else:
 			register_existinguser_label.place(relx=0.5, rely=0.85, anchor=CENTER)
 
@@ -115,7 +120,7 @@ def update_params():
 			update=(30 <= int(lowRateInterval_field.get()) <= 90 and 90 <= int(uppRateInterval_field.get()) <= 180 and
 			0.00 <= float(vPaceAmp_field.get()) <= 5.00 and 1 <= int(vPulseWidth_field.get()) <= 100 and
 			0.00 <= float(aPaceAmp_field.get()) <= 5.00 and 1 <= int(aPulseWidth_field.get()) <= 100 and
-			150 <= int(vrp_field.get()) <= 500 and 150 <= int(arp_field.get()) <= 500)
+			150 <= int(vrp_field.get()) <= 500 and 150 <= int(arp_field.get()) <= 500 and 70 <= int(avDelay_field.get()) <= 300)
 			if update:
 				parameterlist.append(lowRateInterval_field.get())
 				parameterlist.append(uppRateInterval_field.get())
@@ -125,26 +130,27 @@ def update_params():
 				parameterlist.append(aPulseWidth_field.get())
 				parameterlist.append(vrp_field.get())
 				parameterlist.append(arp_field.get())
+				parameterlist.append(avDelay_field.get())
 				try:
 					databaseList = parameterlist.copy()
 					serialComm.serialTransmit(parameterlist, pacingModeOptionCount)
 					print ('After Serial Before Database', databaseList)
 					db_operations.update_attribute(user_id, databaseList)
-					update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update complete label from frame
+					update_label.place(relx=0.5, rely=0.7, anchor=CENTER) #show update complete label from frame
 					communication_label.config(text='Communicating with pacemaker: Yes')
 				except:
 					no_update_label['text'] = "Update Not Complete: Seems like there is no communication with the pacemaker"
-					no_update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update failed
+					no_update_label.place(relx=0.5, rely=0.7, anchor=CENTER) #show update failed
 					communication_label.config(text='Communicating with pacemaker: No')	
 			else:
 				no_update_label['text'] = "Update Not Complete: Value(s) were out of range!"
-				no_update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update failed	
+				no_update_label.place(relx=0.5, rely=0.7, anchor=CENTER) #show update failed	
 		except:
 			no_update_label['text'] = "Update Not Complete: Value(s) were not inputted in the correct format"
-			no_update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update failed if float inputted when expecting int
+			no_update_label.place(relx=0.5, rely=0.7, anchor=CENTER) #show update failed if float inputted when expecting int
 	elif confirmMode == False:
 		no_update_label['text'] = "Please confirm the mode before sending update!"
-		no_update_label.place(relx=0.5, rely=0.65, anchor=CENTER) #show update failed
+		no_update_label.place(relx=0.5, rely=0.7, anchor=CENTER) #show update failed
 		
 def logout():
 	raise_frame(intro_frame)
@@ -156,6 +162,7 @@ def logout():
 	aPulseWidth_field.delete(0, END)
 	vrp_field.delete(0, END)
 	arp_field.delete(0, END)
+	avDelay_field.delete(0,END)
 	register_username_field.delete(0, END)
 	register_password_field.delete(0, END)
 	username_field.delete(0, END)
@@ -220,21 +227,21 @@ def update_params_page(direction):
 			placeAtrial()
 		elif pacingModeOptionCount == 6: #DOO
 			hideAll()
-			placeDOOs(0)
+			placeDOOs(0,1)
 		elif pacingModeOptionCount == 7: #DOOR
 			hideAll()
-			placeDOOs(1)
+			placeDOOs(1,1)
 		elif pacingModeOptionCount == 8: #VVIR
 			hideAll()
-			placeDOOs(1)
+			placeDOOs(1,0)
 			placeVRP()
 		elif pacingModeOptionCount == 9: #AAIR
 			hideAll()
-			placeDOOs(1)
+			placeDOOs(1,0)
 			placeARP()
 		elif pacingModeOptionCount == 10: #DDDR
 			hideAll()
-			placeDOOs(1)
+			placeDOOs(1,1)
 			placeARP()
 			placeVRP()
 
@@ -268,7 +275,7 @@ def placeAtrial():
 	lowRateInterval_label.place(relx=0.4, rely=0.25, anchor=CENTER)
 	uppRateInterval_label.place(relx=0.4, rely=0.3, anchor=CENTER)
 
-def placeDOOs(selection):
+def placeDOOs(selection,selectionAV):
 	serialCommTest()
 	lowRateInterval_label.place(relx=0.4, rely=0.25, anchor=CENTER)
 	lowRateInterval_field.place(relx=0.6, rely=0.25, anchor=CENTER)
@@ -283,6 +290,9 @@ def placeDOOs(selection):
 	if selection == 1:
 		uppRateInterval_field.place(relx=0.6, rely=0.3, anchor=CENTER)
 		uppRateInterval_label.place(relx=0.4, rely=0.3, anchor=CENTER)
+	if selectionAV == 1:
+		avDelay_label.place(relx=0.4, rely=0.65, anchor=CENTER)
+		avDelay_field.place(relx=0.6, rely=0.65, anchor=CENTER)
 
 def placeVRP():
 	serialCommTest()
@@ -312,6 +322,9 @@ def hideAll():
 	vrp_label.place(relx=2, rely=0.3, anchor=CENTER)
 	arp_field.place(relx=2, rely=0.3, anchor=CENTER)
 	arp_label.place(relx=2, rely=0.3, anchor=CENTER)
+	avDelay_label.place(relx=2, rely=0.65, anchor=CENTER)
+	avDelay_field.place(relx=2, rely=0.65, anchor=CENTER)
+
 
 def show_egram():
 	serialCommTest()
@@ -478,28 +491,34 @@ arp_label.place(relx=2, rely=0.6, anchor=CENTER)
 arp = StringVar()
 arp_field = Entry(params_frame, textvariable=arp)
 arp_field.place(relx=2, rely=0.6, anchor=CENTER)
+#AV Delay Period
+avDelay_label = Label(params_frame, text="AV Delay [70 - 300 ms] :", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
+avDelay_label.place(relx=2, rely=0.65, anchor=CENTER)
+avDelay = StringVar()
+avDelay_field = Entry(params_frame, textvariable=avDelay)
+avDelay_field.place(relx=2, rely=0.65, anchor=CENTER)
 #Buttons
 update_button = Button(params_frame, text="Update", width=15, command=update_params)
-update_button.place(relx=0.4, rely=0.8, anchor=CENTER)
+update_button.place(relx=0.4, rely=0.85, anchor=CENTER)
 modeRight_button = Button(params_frame, text="->", width=5, command= lambda: update_params_page(1))
 modeRight_button.place(relx=0.6, rely=0.2, anchor=CENTER)
 modeLeft_button = Button(params_frame, text="<-", width=5, command= lambda: update_params_page(-1))
 modeLeft_button.place(relx=0.4, rely=0.2, anchor=CENTER)
 logout_button = Button(params_frame, text="Logout", width=15, command=logout)
-logout_button.place(relx=0.6, rely=0.8, anchor=CENTER)
+logout_button.place(relx=0.6, rely=0.85, anchor=CENTER)
 confirm_button = Button(params_frame, text="CONFIRM", width=15, command= lambda: update_params_page(0))
 confirm_button.place(relx=0.7, rely=0.2, anchor=CENTER)
 egram_button = Button(params_frame, text="EGRAM", width=15, command=show_egram)
 egram_button.place(relx=0.9, rely=0.9, anchor=CENTER)
 #Indicator Labels
 communication_label = Label(params_frame, text="Communicating with pacemaker: No", font = "Helvetica 12", justify="left")
-communication_label.place(relx=0.5, rely=0.7, anchor=CENTER)
+communication_label.place(relx=0.5, rely=0.75, anchor=CENTER)
 unexpectedConn_label = Label(params_frame, text="--Unexpected Pacemaker Device Detected--", font = "Helvetica 12", justify="left")
 update_label = Label(params_frame, text="Update Complete", font = "Helvetica 12", justify="center")
-update_label.place(relx=2, rely=0.6, anchor=CENTER) #remove update label from frame
+update_label.place(relx=2, rely=0.70, anchor=CENTER) #remove update label from frame
 
 noUpdateText = ""
 no_update_label= Label(params_frame , text = noUpdateText, font = "Helvetica 12", justify = "center")
-no_update_label.place(relx=2, rely=0.6, anchor=CENTER) #remove no update label from frame
+no_update_label.place(relx=2, rely=0.70, anchor=CENTER) #remove no update label from frame
 
 window.mainloop()
