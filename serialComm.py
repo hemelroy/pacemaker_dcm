@@ -3,7 +3,7 @@ import time
 import sys
 import matplotlib.pyplot as plt
 
-#ser = Serial('COM5', baudrate=115200, timeout=1)
+#ser = Serial('COM7', baudrate=115200, timeout=1)
 
 
 def serialTransmit(parameters, mode):
@@ -11,15 +11,15 @@ def serialTransmit(parameters, mode):
 
 	tx_list[2] = mode + 1
 
-	print (parameters[2],type(parameters[2]))
+	#print (parameters[2],type(parameters[2]))
 	for i in range(0, len(parameters)):
 		if i == 0 or i == 1:
 			parameters [i] = round(1/(int(parameters [i])) * 60 *1000)
 		if i == 2 or i == 4:
 			parameters [i] = (round(float(parameters [i]),2) / 5.0) * 100
 
-	print (tx_list)
-	print (parameters)
+	#print (tx_list)
+	print ('Parameters:', parameters)
 	#index 0: always 1
 	#index 1: 1 for transmit, 0 for receive
 	#index 2 through 20: programmable parameters
@@ -53,16 +53,16 @@ def serialTransmit(parameters, mode):
 	tx_list[16] = int(int(parameters[7]) / 256)
 	tx_list[15] = int(int(parameters[7])) - (tx_list[16] * 256)
 
-	print(tx_list)
+	print('Send:',tx_list)
 
-	ser = Serial('COM5', baudrate=115200, timeout=1)
+	ser = Serial('COM7', baudrate=115200, timeout=1)
 	for i in tx_list:
 		ser.write(bytes([i]))
 	time.sleep(2)
 	ser.close()
 
 def serialReceive():
-	ser = Serial('COM5', baudrate=115200, timeout=1)
+	ser = Serial('COM7', baudrate=115200, timeout=1)
 	vEgram = []
 	aEgram = []
 	for x in range(10):  # Looping 10 times to obtain 10 distinct Data Points for E-GRAM Plots
@@ -107,3 +107,7 @@ def serialReceive():
 	plt.plot(aEgram)
 	plt.show()
 	time.sleep(2)
+
+def serialTest():
+	ser = Serial('COM7', baudrate=115200, timeout=1)
+

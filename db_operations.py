@@ -80,7 +80,7 @@ def login_user(user, password):
 		id = cur.fetchall()[0][0]
 		cur.execute("SELECT * FROM Attributes WHERE user_id=?", (id,)) 
 		parameters = cur.fetchall()[0]
-		print(parameters)
+		print('Database:', parameters)
 		return id, parameters
 	else:
 		return -1, ()
