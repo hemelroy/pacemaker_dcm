@@ -7,23 +7,25 @@ import matplotlib.pyplot as plt
 
 
 def serialTransmit(parameters, mode):
-	tx_list = [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22]
+	tx_list = [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29]
 
 	tx_list[2] = mode + 1
 
 	#print (parameters[2],type(parameters[2]))
 	for i in range(0, len(parameters)):
-		if i == 0 or i == 1:
+		if i == 0 or i == 1 or i == 12:
 			parameters [i] = round(1/(int(parameters [i])) * 60 *1000)
 		if i == 2 or i == 4:
 			parameters [i] = (round(float(parameters [i]),2) / 5.0) * 100
+		if i == 10 or i == 11:
+			parameters [i] = round(((parameters[0]-parameters[1])/parameters[i])/10)
 
 	#print (tx_list)
 	print ('Parameters:', parameters)
 	#index 0: always 1
 	#index 1: 1 for transmit, 0 for receive
-	#index 2 through 20: programmable parameters
-	#index 21: always 22
+	#index 2 through 23: programmable parameters
+	#index 28: always 29
 	
 
 	tx_list[4] = int(int(parameters[0]) / 256)
@@ -56,6 +58,27 @@ def serialTransmit(parameters, mode):
 	avDelay=100
 	tx_list[18] = int(int(parameters[8]) / 256)
 	tx_list[17] = int(int(parameters[8])) - (tx_list[18] * 256)
+	
+	#aThreshold=2
+	#tx_list[20] = int(int(parameters[9]) / 256)
+	#tx_list[19] = int(int(parameters[9])) - (tx_list[20] * 256)	
+	tx_list[19] = int (parameters[9])
+	
+	#reactionTime = 7
+	tx_list[22] = int(int(parameters[10]) / 256)
+	tx_list[21] = int(int(parameters[10])) - (tx_list[22] * 256)
+	
+	#recoveryTime = 7
+	tx_list[24] = int(int(parameters[11]) / 256)
+	tx_list[23] = int(int(parameters[11])) - (tx_list[24] * 256)
+	
+	#uppRateInterval = 180
+	tx_list[26] = int(int(parameters[1]) / 256)
+	tx_list[25] = int(int(parameters[1])) - (tx_list[26] * 256)
+	
+	#msr = 180
+	tx_list[28] = int(int(parameters[12]) / 256)
+	tx_list[27] = int(int(parameters[12])) - (tx_list[28] * 256)
 	
 	print('Send:',tx_list)
 
@@ -114,4 +137,3 @@ def serialReceive():
 
 def serialTest():
 	ser = Serial('COM7', baudrate=115200, timeout=1)
-
