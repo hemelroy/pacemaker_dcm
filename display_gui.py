@@ -63,6 +63,8 @@ def login():
 			reactionTime_field.insert(0, params[11])
 			recoveryTime_field.delete(0, END)
 			recoveryTime_field.insert(0, params[12])
+			msr_field.delete(0, END)
+			msr_field.insert(0, params[13])
 			raise_frame(params_frame)
 		else:
 			unidentified_user_label.place(relx=0.5, rely=0.8, anchor=CENTER)
@@ -91,7 +93,7 @@ def register():
 		is_new_user = db_operations.check_if_exists(user)
 		if is_new_user:
 			user_id = db_operations.register_user(user, password)
-			db_operations.add_attribute(user_id, 60, 180, 2.5, 10, 2.5, 10, 320, 250, 150, 2, 7, 7)
+			db_operations.add_attribute(user_id, 60, 180, 2.5, 10, 2.5, 10, 320, 250, 150, 2, 7, 7, 180)
 			raise_frame(params_frame)
 			parameter_list = db_operations.get_attributes(user_id)
 			print('Database:', parameter_list)
@@ -119,6 +121,8 @@ def register():
 			reactionTime_field.insert(0, parameter_list[11])
 			recoveryTime_field.delete(0, END)
 			recoveryTime_field.insert(0, parameter_list[12])
+			msr_field.delete(0, END)
+			msr_field.insert(0, parameter_list[13])
 		else:
 			register_existinguser_label.place(relx=0.5, rely=0.85, anchor=CENTER)
 
@@ -132,7 +136,7 @@ def update_params():
 			0.00 <= float(vPaceAmp_field.get()) <= 5.00 and 1 <= int(vPulseWidth_field.get()) <= 100 and
 			0.00 <= float(aPaceAmp_field.get()) <= 5.00 and 1 <= int(aPulseWidth_field.get()) <= 100 and
 			150 <= int(vrp_field.get()) <= 500 and 150 <= int(arp_field.get()) <= 500 and 70 <= int(avDelay_field.get()) <= 300 and
-			1 <= int(aThreshold_field.get()) <= 4 and 5 <= int(reactionTime_field.get()) <= 50 and 2 <= int(recoveryTime_field.get()) <= 10)
+			1 <= int(aThreshold_field.get()) <= 4 and 5 <= int(reactionTime_field.get()) <= 50 and 2 <= int(recoveryTime_field.get()) <= 10 and 90 <= int(msr_field.get()) <= 180)
 			if update:
 				parameterlist.append(lowRateInterval_field.get())
 				parameterlist.append(uppRateInterval_field.get())
@@ -146,26 +150,27 @@ def update_params():
 				parameterlist.append(aThreshold_field.get())
 				parameterlist.append(reactionTime_field.get())
 				parameterlist.append(recoveryTime_field.get())
+				parameterlist.append(msr_field.get())
 				try:
 					databaseList = parameterlist.copy()
-					serialComm.serialTransmit(parameterlist[:-3], pacingModeOptionCount)
+					serialComm.serialTransmit(parameterlist[:-1], pacingModeOptionCount)
 					print ('After Serial Before Database', databaseList)
 					db_operations.update_attribute(user_id, databaseList)
-					update_label.place(relx=0.5, rely=0.80, anchor=CENTER) #show update complete label from frame
+					update_label.place(relx=0.5, rely=0.85, anchor=CENTER) #show update complete label from frame
 					communication_label.config(text='Communicating with pacemaker: YES')
 				except:
 					no_update_label['text'] = "Update Not Complete: Seems like there is no communication with the pacemaker"
-					no_update_label.place(relx=0.5, rely=0.80, anchor=CENTER) #show update failed
+					no_update_label.place(relx=0.5, rely=0.85, anchor=CENTER) #show update failed
 					communication_label.config(text='Communicating with pacemaker: NO')	
 			else:
 				no_update_label['text'] = "Update Not Complete: Value(s) were out of range!"
-				no_update_label.place(relx=0.5, rely=0.80, anchor=CENTER) #show update failed	
+				no_update_label.place(relx=0.5, rely=0.85, anchor=CENTER) #show update failed	
 		except:
 			no_update_label['text'] = "Update Not Complete: Value(s) were not inputted in the correct format"
-			no_update_label.place(relx=0.5, rely=0.80, anchor=CENTER) #show update failed if float inputted when expecting int
+			no_update_label.place(relx=0.5, rely=0.85, anchor=CENTER) #show update failed if float inputted when expecting int
 	elif confirmMode == False:
 		no_update_label['text'] = "Please confirm the mode before sending update!"
-		no_update_label.place(relx=0.5, rely=0.80, anchor=CENTER) #show update failed
+		no_update_label.place(relx=0.5, rely=0.85, anchor=CENTER) #show update failed
 		
 def logout():
 	raise_frame(intro_frame)
@@ -181,6 +186,7 @@ def logout():
 	aThreshold_field.delete(0,END)
 	reactionTime_field.delete(0,END)
 	recoveryTime_field.delete(0,END)
+	msr_field.delete(0,END)
 	register_username_field.delete(0, END)
 	register_password_field.delete(0, END)
 	username_field.delete(0, END)
@@ -255,11 +261,13 @@ def update_params_page(direction):
 		elif pacingModeOptionCount == 8: #VVIR
 			hideAll()
 			placeDOOs(1,0)
+			placeVentricle()
 			placeVRP()
 			placeRateAdaptive()
 		elif pacingModeOptionCount == 9: #AAIR
 			hideAll()
 			placeDOOs(1,0)
+			placeAtrial()
 			placeARP()
 			placeRateAdaptive()
 		elif pacingModeOptionCount == 10: #DDDR
@@ -330,6 +338,8 @@ def placeRateAdaptive():
 	reactionTime_field.place(relx=0.6, rely=0.70, anchor=CENTER)
 	recoveryTime_label.place(relx=0.4, rely=0.75, anchor=CENTER)
 	recoveryTime_field.place(relx=0.6, rely=0.75, anchor=CENTER)
+	msr_label.place(relx=0.4, rely=0.80, anchor=CENTER)
+	msr_field.place(relx=0.6, rely=0.80, anchor=CENTER)
 	
 def hideAll():
 	vPaceAmp_label.place(relx=2, rely=0.35, anchor=CENTER)
@@ -356,7 +366,9 @@ def hideAll():
 	reactionTime_field.place(relx=2, rely=0.70, anchor=CENTER)
 	recoveryTime_label.place(relx=2, rely=0.75, anchor=CENTER)
 	recoveryTime_field.place(relx=2, rely=0.75, anchor=CENTER)
-
+	msr_label.place(relx=2, rely=0.80, anchor=CENTER)
+	msr_field.place(relx=2, rely=0.80, anchor=CENTER)
+	
 def show_egram():
 	serialComm.serialReceive()
 
@@ -545,28 +557,35 @@ recoveryTime_label.place(relx=2, rely=0.75, anchor=CENTER)
 recoveryTime = StringVar()
 recoveryTime_field = Entry(params_frame, textvariable=recoveryTime)
 recoveryTime_field.place(relx=2, rely=0.75, anchor=CENTER)
+#Maximum Sensor Rate
+msr_label = Label(params_frame, text="Maximum Sensor Rate [90 -  180 bpm] :", fg = "white", bg="#31749b", font = "Helvetica 12", justify="left")
+msr_label.place(relx=2, rely=0.75, anchor=CENTER)
+msr = StringVar()
+msr_field = Entry(params_frame, textvariable=msr)
+msr_field.place(relx=2, rely=0.80, anchor=CENTER)
+
 #Buttons
 update_button = Button(params_frame, text="Update", width=15, command=update_params)
-update_button.place(relx=0.4, rely=0.90, anchor=CENTER)
+update_button.place(relx=0.4, rely=0.95, anchor=CENTER)
 modeRight_button = Button(params_frame, text="->", width=5, command= lambda: update_params_page(1))
 modeRight_button.place(relx=0.6, rely=0.15, anchor=CENTER)
 modeLeft_button = Button(params_frame, text="<-", width=5, command= lambda: update_params_page(-1))
 modeLeft_button.place(relx=0.4, rely=0.15, anchor=CENTER)
 logout_button = Button(params_frame, text="Logout", width=15, command=logout)
-logout_button.place(relx=0.6, rely=0.90, anchor=CENTER)
+logout_button.place(relx=0.6, rely=0.95, anchor=CENTER)
 confirm_button = Button(params_frame, text="CONFIRM", width=15, command= lambda: update_params_page(0))
 confirm_button.place(relx=0.7, rely=0.2, anchor=CENTER)
 egram_button = Button(params_frame, text="EGRAM", width=15, command=show_egram)
-egram_button.place(relx=0.8, rely=0.90, anchor=CENTER)
+egram_button.place(relx=0.8, rely=0.95, anchor=CENTER)
 #Indicator Labels
 communication_label = Label(params_frame, text="Communicating with pacemaker: NO", font = "Helvetica 12", justify="left")
-communication_label.place(relx=0.5, rely=0.85, anchor=CENTER)
+communication_label.place(relx=0.5, rely=0.90, anchor=CENTER)
 unexpectedConn_label = Label(params_frame, text="--Unexpected Pacemaker Device Detected--", font = "Helvetica 12", justify="left")
 update_label = Label(params_frame, text="Update Complete", font = "Helvetica 12", justify="center")
-update_label.place(relx=2, rely=0.80, anchor=CENTER) #remove update label from frame
+update_label.place(relx=2, rely=0.85, anchor=CENTER) #remove update label from frame
 
 noUpdateText = ""
 no_update_label= Label(params_frame , text = noUpdateText, font = "Helvetica 12", justify = "center")
-no_update_label.place(relx=2, rely=0.80, anchor=CENTER) #remove no update label from frame
+no_update_label.place(relx=2, rely=0.85, anchor=CENTER) #remove no update label from frame
 
 window.mainloop()
